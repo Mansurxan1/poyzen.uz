@@ -1,100 +1,112 @@
 "use client"
 
 import type React from "react"
-import { useRef, useEffect, useState } from "react"
-import { FiSearch, FiX } from "react-icons/fi"
+import { useLocation, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
+import { useProductSearch } from "@/hooks/useProductSearch"
+import ProductGrid from "@/pages/productAll/components/ProductGrid"
 import Button from "@/components/ui/button"
 
-interface SearchBarProps {
-  isSearchOpen: boolean
-  toggleSearch: () => void
-}
-
-const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => {
+const Search: React.FC = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const currentLang = useSelector((state: RootState) => state.language.language)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const searchQuery = queryParams.get("q") || ""
+  const language = useSelector((state: RootState) => state.language.language)
 
-  useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      setTimeout(() => {
-        searchInputRef.current?.focus()
-      }, 100)
-    }
-  }, [isSearchOpen])
-
-  const popularSearches = ["Nike", "Adidas", "Jordan", "Yeezy", "Air Max"]
-
-  const handleSearch = (query: string) => {
-    if (query.trim()) {
-      navigate(`/${currentLang}/search?q=${encodeURIComponent(query.trim())}`)
-      toggleSearch()
-      setSearchQuery("")
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch(searchQuery)
-    } else if (e.key === "Escape") {
-      toggleSearch()
-    }
-  }
-
-  const handlePopularSearch = (term: string) => {
-    handleSearch(term)
-  }
+  const { searchResults, suggestedProducts, popularBrands, popularCategories, hasExactResults, hasSuggestions } =
+    useProductSearch(searchQuery)
 
   return (
-    <div
-      className={`bg-white border-b border-gray-200 transition-all duration-300 ease-in-out ${
-        isSearchOpen ? "max-h-32 opacity-100" : "max-h-0 opacity-0"
-      } overflow-hidden`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="relative max-w-2xl mx-auto">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <FiSearch className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("searchPlaceholder") || "Search products..."}
-            className="block w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-            onKeyDown={handleKeyDown}
-          />
-          <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-            <Button onClick={toggleSearch} variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
-              <FiX className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-        <div className="max-w-2xl mx-auto mt-3">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {popularSearches.map((item) => (
-              <Button
-                key={item}
-                onClick={() => handlePopularSearch(item)}
-                variant="ghost"
-                size="sm"
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm border border-gray-200"
-              >
-                {item}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+        {t("search_results_for")}: "{searchQuery}"
+      </h1>
+
+      {hasExactResults ? (
+        <ProductGrid products={searchResults} title={t("searchResults")} />
+      ) : (
+        <div className="text-center py-8 mb-8">
+          <div className="text-gray-400 text-6xl mb-4">😔</div>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">{t("no_results_for_query")}</h3>
+          <p className="text-gray-500 mb-4">{t("try_broadening_search")}</p>
+
+          {hasSuggestions && (
+            <div className="mt-8">
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">{t("search_suggestions")}</h4>
+              <div className="flex flex-wrap justify-center gap-4">
+                {suggestedProducts.length > 0 && (
+                  <div className="w-full">
+                    <h5 className="text-md font-medium text-gray-600 mb-2">{t("suggested_products")}</h5>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {suggestedProducts.map((product) => (
+                        <Link
+                          key={product.id}
+                          to={`/${language}/${product.brand}/${product.nameUrl}/${product.id}`}
+                          className="block p-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow text-sm text-gray-700"
+                        >
+                          {product.brand} - {product.productName}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {popularBrands.length > 0 && (
+                  <div className="w-full mt-4">
+                    <h5 className="text-md font-medium text-gray-600 mb-2">{t("popular_brands")}</h5>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {popularBrands.map((brand) => (
+                        <Link
+                          key={brand}
+                          to={`/${language}/brand/${brand.toLowerCase()}`}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm"
+                        >
+                          {brand}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {popularCategories.length > 0 && (
+                  <div className="w-full mt-4">
+                    <h5 className="text-md font-medium text-gray-600 mb-2">{t("popular_categories")}</h5>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {popularCategories.map((category) => (
+                        <Link
+                          key={category.id}
+                          to={`/${language}/category/${category.id}`}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm"
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Link to={`/${language}/products`}>
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg w-full sm:w-auto">
+                {t("view_all_products")}
               </Button>
-            ))}
+            </Link>
+            <Link to={`/${language}`}>
+              <Button variant="outline" className="px-6 py-3 rounded-lg w-full sm:w-auto bg-transparent">
+                {t("back_to_home")}
+              </Button>
+            </Link>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
-export default SearchBar
+export default Search

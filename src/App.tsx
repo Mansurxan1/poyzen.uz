@@ -9,6 +9,8 @@ import type { RootState, AppDispatch } from "./redux"
 import { initializeLanguage } from "@/features/languageSlice"
 import Home from "@/pages/Home/home"
 import ProductAll from "@/pages/productAll/ProductAll"
+import Likes from "@/pages/likes/likes" // Import Likes page
+import Search from "@/pages/Search/search" // Import Search page
 
 const App = () => {
   const dispatch: AppDispatch = useDispatch()
@@ -37,6 +39,8 @@ const App = () => {
           <Route path="/" element={<Navigate to={`/${currentLang}`} replace />} />
           <Route path="/:lang" element={<Home />} />
           <Route path="/:lang/products" element={<ProductAll />} />
+          <Route path="/:lang/likes" element={<Likes />} /> {/* Add Likes route */}
+          <Route path="/:lang/search" element={<Search />} /> {/* Add Search route */}
           <Route path="*" element={<Navigate to={`/${currentLang}`} replace />} />
         </Routes>
       </div>
@@ -45,3 +49,4 @@ const App = () => {
 }
 
 export default App
+

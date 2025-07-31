@@ -99,7 +99,7 @@ const initialState: ProductState = {
             ],
             inStock: true,
             inAdvancePayment: true,
-            createdAt: "2025-07-30T12:00:00Z",
+            createdAt: "2025-07-31T12:00:00Z",
           },
           {
             id: "nike-am90-black",
