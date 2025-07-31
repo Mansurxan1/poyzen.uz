@@ -1,52 +1,27 @@
-import type React from "react";
-import { useState, useRef, useEffect, useMemo } from "react";
-import { FaChevronDown } from "react-icons/fa";
+"use client"
 
-interface DropdownOption {
-  value: string;
-  label: string;
-}
+import type React from "react"
+import { useState, useMemo } from "react"
+import { FaChevronDown } from "react-icons/fa"
+import { useClickOutside } from "@/hooks/useClickOutside"
+import type { DropdownProps } from "@/types"
 
-interface DropdownProps {
-  options: DropdownOption[];
-  placeholder?: string;
-  onSelect?: (value: string) => void;
-  initialValue?: string;
-}
-
-const Dropdown: React.FC<DropdownProps> = ({
-  options,
-  placeholder = "Tanlang",
-  onSelect,
-  initialValue,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = "Tanlang", onSelect, initialValue }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
   const displayedLabel = useMemo(() => {
     if (initialValue) {
-      const selectedOption = options.find((opt) => opt.value === initialValue);
-      return selectedOption ? selectedOption.label : placeholder;
+      const selectedOption = options.find((opt) => opt.value === initialValue)
+      return selectedOption ? selectedOption.label : placeholder
     }
-    return placeholder;
-  }, [initialValue, options, placeholder]);
+    return placeholder
+  }, [initialValue, options, placeholder])
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleSelect = (option: DropdownOption) => {
-    setIsOpen(false);
-    onSelect?.(option.value);
-  };
+  const handleSelect = (option: (typeof options)[0]) => {
+    setIsOpen(false)
+    onSelect?.(option.value)
+  }
 
   return (
     <div className="relative w-52" ref={dropdownRef}>
@@ -57,9 +32,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       >
         <span className="text-sm text-gray-700">{displayedLabel}</span>
         <FaChevronDown
-          className={`w-3.5 h-3.5 ml-2 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : "rotate-0"
-          }`}
+          className={`w-3.5 h-3.5 ml-2 transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
         />
       </button>
       {isOpen && (
@@ -76,7 +49,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         </ul>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Dropdown;
+export default Dropdown

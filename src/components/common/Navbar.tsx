@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa"
@@ -6,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux"
 import type { RootState, AppDispatch } from "@/redux"
 import { setCurrency } from "@/features/currencySlice"
 import { setLanguage } from "@/features/languageSlice"
-import SearchBar from "@/pages/Search/search"
+import SearchBar from "@/components/common/SearchBar"
 import Dropdown from "@/components/ui/dropdown"
 import Button from "@/components/ui/button"
 
@@ -14,15 +16,12 @@ const Navbar: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const dispatch: AppDispatch = useDispatch()
-
   const currentLang = useSelector((state: RootState) => state.language.language)
   const currentCurrency = useSelector((state: RootState) => state.currency.currency)
   const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
   const cartItems = useSelector((state: RootState) => state.cart.items)
-
   const likeCount = likedProducts.length
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
@@ -52,13 +51,10 @@ const Navbar: React.FC = () => {
 
   const handleLanguageChange = (newLangValue: string) => {
     if (currentLang === newLangValue) return
-
     dispatch(setLanguage(newLangValue))
-
     const currentPath = window.location.pathname
     const pathSegments = currentPath.split("/").filter(Boolean)
     const knownLanguages = languageOptions.map((opt) => opt.value)
-
     let targetPath: string
     if (pathSegments.length > 0 && knownLanguages.includes(pathSegments[0])) {
       pathSegments[0] = newLangValue
@@ -66,18 +62,19 @@ const Navbar: React.FC = () => {
     } else {
       targetPath = `/${newLangValue}/${pathSegments.join("/")}`
     }
-
     navigate(targetPath)
   }
 
   const handleLikesClick = () => {
     navigate(`/${currentLang}/likes`)
   }
+
   const handleCartClick = () => navigate(`/${currentLang}/cart`)
+
   const handleProfileClick = () => navigate(`/${currentLang}/profile`)
 
   return (
-    <div className="sticky top-0 z-50">
+    <div className="sticky top-0 z-[999]">
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
@@ -89,7 +86,6 @@ const Navbar: React.FC = () => {
                 Poyzen
               </span>
             </Link>
-
             <div className="hidden lg:flex flex-1 justify-center mx-8">
               <div className="flex items-center space-x-1">
                 {navLinks.map((link) => (
@@ -104,12 +100,10 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
             </div>
-
             <div className="flex items-center space-x-2">
               <Button onClick={toggleSearch} variant="ghost" size="icon">
                 <FaSearch className="h-5 w-5" />
               </Button>
-
               <Button onClick={handleLikesClick} variant="ghost" size="icon" className="relative">
                 <FaHeart className="h-5 w-5" />
                 {likeCount > 0 && (
@@ -118,7 +112,6 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </Button>
-
               <Button onClick={handleCartClick} variant="ghost" size="icon" className="relative">
                 <FaShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
@@ -127,32 +120,27 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </Button>
-
               <Dropdown
                 options={currencyOptions}
                 placeholder={currentCurrency.toUpperCase()}
                 onSelect={handleCurrencyChange}
                 initialValue={currentCurrency}
               />
-
               <Dropdown
                 options={languageOptions}
                 placeholder={t("language")}
                 onSelect={handleLanguageChange}
                 initialValue={currentLang}
               />
-
               <Button onClick={handleProfileClick} variant="outline" size="icon">
                 <FaUser className="h-5 w-5" />
               </Button>
-
               <Button onClick={toggleMobileMenu} variant="ghost" size="icon" className="lg:hidden">
                 {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
               </Button>
             </div>
           </div>
         </div>
-
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="px-4 py-3 space-y-2 max-w-7xl mx-auto">
@@ -170,7 +158,6 @@ const Navbar: React.FC = () => {
           </div>
         )}
       </nav>
-
       <SearchBar isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
     </div>
   )

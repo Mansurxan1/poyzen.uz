@@ -1,84 +1,99 @@
-import React, { useState, useRef, useEffect } from "react";
-import { FaChevronDown } from "react-icons/fa";
+"use client"
 
-interface DropdownOption {
-  value: string;
-  label: string;
-  color?: string;
-}
+import type React from "react"
+import { useState, useEffect, useCallback } from "react"
+import { FaChevronDown } from "react-icons/fa"
+import { useClickOutside } from "@/hooks/useClickOutside"
+import type { MultiSelectDropdownProps } from "@/types"
 
-interface DropdownProps {
-  options: DropdownOption[];
-  placeholder?: string;
-  onSelect?: (values: string[]) => void;
-  initialValues?: string[];
-  enableSearch?: boolean;
-  closeOnSelect?: boolean;
-  isOpen?: boolean;
-  setIsOpen?: (open: boolean) => void;
-}
-
-const MultiSelectDropdown: React.FC<DropdownProps> = ({
+const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   options,
   placeholder = "Tanlang",
   onSelect,
   initialValues = [],
   enableSearch = false,
-  closeOnSelect = true,
-  isOpen: controlledIsOpen,
-  setIsOpen: controlledSetIsOpen,
+  closeOnSelect = false,
+  isOpen: controlledIsOpen, // Controlled prop for external state
+  setIsOpen: controlledSetIsOpen, // Controlled setter for external state
 }) => {
-  const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  const setIsOpen = controlledSetIsOpen || setInternalIsOpen;
-  const [selectedValues, setSelectedValues] = useState<string[]>(initialValues);
-  const [searchTerm, setSearchTerm] = useState("");
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Internal state, used if not controlled externally
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
 
+  // Determine current isOpen state: controlled (if provided) or internal
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen
+  // Determine current setIsOpen function: controlled (if provided) or internal
+  const setIsOpen = controlledSetIsOpen || setInternalIsOpen
+
+  const [selectedValues, setSelectedValues] = useState<string[]>(initialValues)
+  const [searchTerm, setSearchTerm] = useState("")
+
+  // Click outside handler
+  const dropdownRef = useClickOutside<HTMLDivElement>(() => {
+    setIsOpen(false) // Always close on click outside
+  })
+
+  // Update selected values when initialValues prop changes
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    setSelectedValues(initialValues)
+  }, [initialValues])
 
-  const handleSelect = (value: string) => {
-    let newValues: string[];
-    if (selectedValues.includes(value)) {
-      newValues = selectedValues.filter((v) => v !== value);
-    } else {
-      newValues = [...selectedValues, value];
-    }
-    setSelectedValues(newValues);
-    onSelect?.(newValues);
-    if (closeOnSelect) {
-      setIsOpen(false);
-    }
-  };
+  const handleSelect = useCallback(
+    (value: string, e: React.MouseEvent) => {
+      e.preventDefault() // Prevent default behavior (e.g., form submission if inside a form)
+      e.stopPropagation() // Stop event from bubbling up to parent elements
+
+      let newValues: string[]
+      if (selectedValues.includes(value)) {
+        newValues = selectedValues.filter((v) => v !== value)
+      } else {
+        newValues = [...selectedValues, value]
+      }
+
+      setSelectedValues(newValues)
+      onSelect?.(newValues)
+
+      // Close dropdown only if closeOnSelect is true
+      if (closeOnSelect) {
+        setIsOpen(false)
+      }
+    },
+    [selectedValues, onSelect, closeOnSelect, setIsOpen],
+  )
+
+  const handleToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsOpen(!isOpen) // Toggle the dropdown state using the determined setIsOpen function
+    },
+    [isOpen, setIsOpen],
+  )
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation() // Prevent event from bubbling up
+    setSearchTerm(e.target.value)
+  }, [])
+
+  const handleSearchClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent dropdown from closing when clicking inside search input
+  }, [])
 
   const filteredOptions = options.filter((option) =>
-    enableSearch
-      ? option.label.toLowerCase().includes(searchTerm.toLowerCase())
-      : true
-  );
+    enableSearch ? option.label.toLowerCase().includes(searchTerm.toLowerCase()) : true,
+  )
 
   const displayedLabel =
     selectedValues.length > 0
-      ? selectedValues
-          .map((val) => options.find((opt) => opt.value === val)?.label || val)
-          .join(", ")
-      : placeholder;
+      ? selectedValues.length === 1
+        ? options.find((opt) => opt.value === selectedValues[0])?.label || selectedValues[0]
+        : `${selectedValues.length} tanlangan`
+      : placeholder
 
   return (
-    <div className="relative w-64" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="w-full px-4 py-3 flex items-center justify-between bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 hover:bg-gray-50"
       >
         <span className="text-sm text-gray-700 truncate">{displayedLabel}</span>
@@ -88,41 +103,53 @@ const MultiSelectDropdown: React.FC<DropdownProps> = ({
           }`}
         />
       </button>
+
+      {/* Use relative positioning to push content down instead of overlay */}
       {isOpen && (
-        <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+        <div className="relative z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-hidden">
           {enableSearch && (
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Qidirish..."
-              className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none text-sm text-gray-700 bg-gray-50"
-            />
-          )}
-          {filteredOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 text-sm text-gray-700 transition-colors duration-150"
-            >
+            <div className="p-2 border-b border-gray-200">
               <input
-                type="checkbox"
-                checked={selectedValues.includes(option.value)}
-                onChange={() => handleSelect(option.value)}
-                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onClick={handleSearchClick}
+                placeholder="Qidirish..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-700"
               />
-              {option.color && (
-                <span
-                  className="w-4 h-4 rounded-full inline-block border border-gray-300 mr-2"
-                  style={{ backgroundColor: option.color }}
-                ></span>
-              )}
-              {option.label}
-            </label>
-          ))}
+            </div>
+          )}
+          <div className="max-h-60 overflow-y-auto">
+            {filteredOptions.map((option) => (
+              <div
+                key={option.value}
+                className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 text-sm text-gray-700 transition-colors duration-150"
+                onClick={(e) => handleSelect(option.value, e)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(option.value)}
+                  onChange={() => {}} // Handled by parent click
+                  onClick={(e) => e.stopPropagation()} // Prevent checkbox click from bubbling up
+                  className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded pointer-events-none" // Make checkbox non-interactive directly
+                />
+                {option.color && (
+                  <span
+                    className="w-4 h-4 rounded-full inline-block border border-gray-300 mr-2"
+                    style={{ backgroundColor: option.color }}
+                  ></span>
+                )}
+                <span className="flex-1">{option.label}</span>
+              </div>
+            ))}
+            {filteredOptions.length === 0 && (
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">Hech narsa topilmadi</div>
+            )}
+          </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default MultiSelectDropdown;
+export default MultiSelectDropdown

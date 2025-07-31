@@ -1,13 +1,9 @@
-import React from "react";
+"use client"
 
-interface CheckboxProps {
-  label: React.ReactNode;
-  checked: boolean;
-  onChange: () => void;
-  className?: string;
-}
+import type React from "react"
+import type { CheckboxProps } from "@/types"
 
-const Checkbox: React.FC<CheckboxProps> = ({ label, checked, onChange, className }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ label, checked, onChange, className = "" }) => {
   return (
     <label
       className={`flex items-center mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-150 cursor-pointer ${className}`}
@@ -20,7 +16,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, checked, onChange, className
       />
       <span className="text-sm text-gray-700">{label}</span>
     </label>
-  );
-};
+  )
+}
 
-export default Checkbox;
+export default Checkbox
