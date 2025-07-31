@@ -1,18 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
 interface CurrencyState {
   currency: string
 }
 
+const getInitialCurrency = (): string => {
+  return localStorage.getItem("currency") || "usd"
+}
+
 const initialState: CurrencyState = {
-  currency: localStorage.getItem("currency") || "usd",
+  currency: getInitialCurrency(),
 }
 
 const currencySlice = createSlice({
   name: "currency",
   initialState,
   reducers: {
-    setCurrency: (state, action: { payload: string }) => {
+    setCurrency: (state, action: PayloadAction<string>) => {
       state.currency = action.payload
       localStorage.setItem("currency", action.payload)
     },

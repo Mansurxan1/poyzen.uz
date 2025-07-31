@@ -82,12 +82,7 @@ const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const navigate = useNavigate()
 
-  // tilni i18n ga sinxronlashtirish
-  useEffect(() => {
-    if (i18n.language !== lang) {
-      i18n.changeLanguage(lang)
-    }
-  }, [i18n, lang])
+  // Language synchronization is now handled by Redux and i18n initialization
 
   // banner har 5 soniyada almashsin
   useEffect(() => {

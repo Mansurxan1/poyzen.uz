@@ -1,26 +1,60 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
+import type { LikedProduct } from "@/types"
 
 interface LikesState {
-  likedProducts: string[]; // Adjust type based on your data (e.g., array of product IDs or objects)
+  likedProducts: LikedProduct[]
+}
+
+// Get initial likes from localStorage
+const getInitialLikes = (): LikedProduct[] => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem("liked-products")
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch (error) {
+        console.error("Error parsing liked products from localStorage:", error)
+        return []
+      }
+    }
+  }
+  return []
 }
 
 const initialState: LikesState = {
-  likedProducts: [], // Initialize as an empty array to avoid undefined
-};
+  likedProducts: getInitialLikes(),
+}
 
 const likesSlice = createSlice({
-  name: 'likes',
+  name: "likes",
   initialState,
   reducers: {
-    addLike(state, action) {
-      state.likedProducts.push(action.payload);
+    addLike: (state, action: PayloadAction<LikedProduct>) => {
+      const exists = state.likedProducts.find((item) => item.id === action.payload.id)
+      if (!exists) {
+        state.likedProducts.push(action.payload)
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("liked-products", JSON.stringify(state.likedProducts))
+        }
+      }
     },
-    removeLike(state, action) {
-      state.likedProducts = state.likedProducts.filter((id) => id !== action.payload);
+    removeLike: (state, action: PayloadAction<string>) => {
+      state.likedProducts = state.likedProducts.filter((item) => item.id !== action.payload)
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("liked-products", JSON.stringify(state.likedProducts))
+      }
     },
-    // Add other reducers as needed
+    clearLikes: (state) => {
+      state.likedProducts = []
+      // Clear from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem("liked-products")
+      }
+    },
   },
-});
+})
 
-export const { addLike, removeLike } = likesSlice.actions;
-export default likesSlice.reducer;
+export const { addLike, removeLike, clearLikes } = likesSlice.actions
+export default likesSlice.reducer

@@ -1,0 +1,21 @@
+import React, { type InputHTMLAttributes } from "react";
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  className?: string;
+}
+
+const Input: React.FC<InputProps> = ({ className, ...props }) => {
+  return (
+    <input
+      {...props}
+      className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+      onKeyDown={(e) => {
+        if (props.type === "number" && ["e", "E", "+", "-"].includes(e.key)) {
+          e.preventDefault();
+        }
+      }}
+    />
+  );
+};
+
+export default Input;

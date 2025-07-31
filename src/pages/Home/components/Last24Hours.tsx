@@ -7,8 +7,8 @@ import { Link } from "react-router-dom";
 import Button from "@/components/ui/button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
+// @ts-expect-error - Swiper CSS import
+import "swiper/css/bundle";
 
 const Last24HoursProducts = () => {
   const { t } = useTranslation();
@@ -136,20 +136,26 @@ const Last24HoursProducts = () => {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-                <button
-                  onClick={(e) => toggleLike(item.id, e)}
-                  className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 ${
-                    likedProducts[item.id]
-                      ? "bg-white border-none"
-                      : "bg-black border border-black"
-                  }`}
-                >
-                  {likedProducts[item.id] ? (
-                    <AiFillHeart className="w-5 h-5 text-teal-400" aria-label="unlike" />
-                  ) : (
-                    <AiOutlineHeart className="w-5 h-5 text-white" aria-label="like" />
-                  )}
-                </button>
+                                      {/* Discount Badge */}
+                      {item.discount < item.price && (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                          -{Math.round(((item.price - item.discount) / item.price) * 100)}%
+                        </div>
+                      )}
+                      <button
+                        onClick={(e) => toggleLike(item.id, e)}
+                        className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 ${
+                          likedProducts[item.id]
+                            ? "bg-white border-none"
+                            : "bg-black border border-black"
+                        }`}
+                      >
+                        {likedProducts[item.id] ? (
+                          <AiFillHeart className="w-5 h-5 text-teal-400" aria-label="unlike" />
+                        ) : (
+                          <AiOutlineHeart className="w-5 h-5 text-white" aria-label="like" />
+                        )}
+                      </button>
               </div>
               <div className="p-2">
                 <h3 className="font-semibold line-clamp-2 text-ellipsis overflow-hidden">

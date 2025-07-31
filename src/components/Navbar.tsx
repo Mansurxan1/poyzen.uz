@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux"
 import type { RootState, AppDispatch } from "@/redux"
 import { setCurrency } from "@/features/currencySlice"
 import { setLanguage } from "@/features/languageSlice"
-import SearchBar from "@p/Search/search"
+import SearchBar from "@/pages/Search/search"
 import Dropdown from "@/components/ui/dropdown"
 import Button from "@/components/ui/button"
 
@@ -15,31 +15,29 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate()
   const dispatch: AppDispatch = useDispatch()
 
-  // Redux store'dan holatni olamiz
   const currentLang = useSelector((state: RootState) => state.language.language)
   const currentCurrency = useSelector((state: RootState) => state.currency.currency)
   const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
   const cartItems = useSelector((state: RootState) => state.cart.items)
 
-  const likeCount = likedProducts.length 
+  const likeCount = likedProducts.length
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
-  // Removed the useEffect that was causing circular updates
-  // The languageSlice already handles i18n.changeLanguage() when setLanguage is dispatched
-
   const navLinks = [
     { to: "/", label: t("home") },
-    { to: "/brand", label: t("brand") },
+    { to: "/brand", label: t("brands") },
     { to: "/products", label: t("products") },
     { to: "/contact", label: t("contact") },
   ]
+
   const languageOptions = [
     { value: "uz", label: "UZB" },
     { value: "ru", label: "РУС" },
   ]
+
   const currencyOptions = [
     { value: "usd", label: "USD" },
     { value: "uzs", label: "UZS" },
@@ -49,20 +47,16 @@ const Navbar: React.FC = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev)
 
   const handleCurrencyChange = (val: string) => {
-    dispatch(setCurrency(val)) // setCurrency action'ini dispatch qilamiz
+    dispatch(setCurrency(val))
   }
 
   const handleLanguageChange = (newLangValue: string) => {
-    // Avoid double dispatch by checking if language is already the same
-    if (currentLang === newLangValue) {
-      return
-    }
-    
-    dispatch(setLanguage(newLangValue)) // Reduxni yangilaydi va languageSlice ichida i18n.changeLanguage() ni chaqiradi
+    if (currentLang === newLangValue) return
+
+    dispatch(setLanguage(newLangValue))
 
     const currentPath = window.location.pathname
     const pathSegments = currentPath.split("/").filter(Boolean)
-
     const knownLanguages = languageOptions.map((opt) => opt.value)
 
     let targetPath: string
@@ -70,15 +64,15 @@ const Navbar: React.FC = () => {
       pathSegments[0] = newLangValue
       targetPath = `/${pathSegments.join("/")}`
     } else {
-      // Agar til segmenti bo'lmasa, lekin boshqa segmentlar bo'lsa, yangi tilni oldiga qo'shamiz
-      // Agar pathSegments bo'sh bo'lsa (masalan, faqat "/"), bu "/newLangValue" bo'ladi
       targetPath = `/${newLangValue}/${pathSegments.join("/")}`
     }
 
     navigate(targetPath)
   }
 
-  const handleLikesClick = () => navigate(`/${currentLang}/likes`)
+  const handleLikesClick = () => {
+    navigate(`/${currentLang}/likes`)
+  }
   const handleCartClick = () => navigate(`/${currentLang}/cart`)
   const handleProfileClick = () => navigate(`/${currentLang}/profile`)
 
@@ -87,7 +81,6 @@ const Navbar: React.FC = () => {
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
-            {/* Logo */}
             <Link to={`/${currentLang}`} className="flex items-center group">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
                 <span className="text-white font-bold text-xl">P</span>
@@ -96,7 +89,7 @@ const Navbar: React.FC = () => {
                 Poyzen
               </span>
             </Link>
-            {/* Nav links */}
+
             <div className="hidden lg:flex flex-1 justify-center mx-8">
               <div className="flex items-center space-x-1">
                 {navLinks.map((link) => (
@@ -111,11 +104,12 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
             </div>
-            {/* Action buttons */}
+
             <div className="flex items-center space-x-2">
               <Button onClick={toggleSearch} variant="ghost" size="icon">
                 <FaSearch className="h-5 w-5" />
               </Button>
+
               <Button onClick={handleLikesClick} variant="ghost" size="icon" className="relative">
                 <FaHeart className="h-5 w-5" />
                 {likeCount > 0 && (
@@ -124,6 +118,7 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </Button>
+
               <Button onClick={handleCartClick} variant="ghost" size="icon" className="relative">
                 <FaShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
@@ -132,33 +127,35 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </Button>
-              {/* Currency Dropdown */}
+
               <Dropdown
                 options={currencyOptions}
                 placeholder={currentCurrency.toUpperCase()}
                 onSelect={handleCurrencyChange}
                 initialValue={currentCurrency}
               />
-              {/* Language Dropdown */}
+
               <Dropdown
                 options={languageOptions}
                 placeholder={t("language")}
                 onSelect={handleLanguageChange}
                 initialValue={currentLang}
               />
+
               <Button onClick={handleProfileClick} variant="outline" size="icon">
                 <FaUser className="h-5 w-5" />
               </Button>
+
               <Button onClick={toggleMobileMenu} variant="ghost" size="icon" className="lg:hidden">
                 {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
               </Button>
             </div>
           </div>
         </div>
-        {/* Mobile Menu */}
+
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-3 space-y-2">
+            <div className="px-4 py-3 space-y-2 max-w-7xl mx-auto">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -173,7 +170,7 @@ const Navbar: React.FC = () => {
           </div>
         )}
       </nav>
-      {/* Search Bar */}
+
       <SearchBar isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
     </div>
   )
