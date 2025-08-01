@@ -19,9 +19,9 @@ const Navbar: React.FC = () => {
   const currentLang = useSelector((state: RootState) => state.language.language)
   const currentCurrency = useSelector((state: RootState) => state.currency.currency)
   const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
-  const cartItems = useSelector((state: RootState) => state.cart.items)
+  const cartItems = useSelector((state: RootState) => state.cart.items) // Get cart items from Redux
   const likeCount = likedProducts.length
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0) // Calculate total cart quantity
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
@@ -74,7 +74,7 @@ const Navbar: React.FC = () => {
   const handleProfileClick = () => navigate(`/${currentLang}/profile`)
 
   return (
-    <div className="sticky top-0 z-[999]">
+    <div className="sticky top-0 z-50">
       <nav className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">

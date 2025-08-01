@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
 import { useProductSearch } from "@/hooks/useProductSearch"
-import ProductGrid from "@/pages/productAll/components/ProductGrid"
+import ProductCard from "@/pages/productAll/components/ProductCard" // Import ProductCard
 import Button from "@/components/ui/button"
 
 const Search: React.FC = () => {
@@ -26,7 +26,14 @@ const Search: React.FC = () => {
       </h1>
 
       {hasExactResults ? (
-        <ProductGrid products={searchResults} title={t("searchResults")} />
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t("searchResults")}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 auto-rows-fr">
+            {searchResults.map((variant) => (
+              <ProductCard key={variant.id} variant={variant} />
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="text-center py-8 mb-8">
           <div className="text-gray-400 text-6xl mb-4">😔</div>
@@ -35,20 +42,14 @@ const Search: React.FC = () => {
 
           {hasSuggestions && (
             <div className="mt-8">
-              <h4 className="text-lg font-semibold text-gray-700 mb-4">{t("search_suggestions")}</h4>
+              <h4 className="text-lg font-semibold text-gray-700 mb-4">{t("products_you_might_like")}</h4>
               <div className="flex flex-wrap justify-center gap-4">
                 {suggestedProducts.length > 0 && (
                   <div className="w-full">
                     <h5 className="text-md font-medium text-gray-600 mb-2">{t("suggested_products")}</h5>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                       {suggestedProducts.map((product) => (
-                        <Link
-                          key={product.id}
-                          to={`/${language}/${product.brand}/${product.nameUrl}/${product.id}`}
-                          className="block p-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow text-sm text-gray-700"
-                        >
-                          {product.brand} - {product.productName}
-                        </Link>
+                        <ProductCard key={product.id} variant={product} /> // Use ProductCard here
                       ))}
                     </div>
                   </div>

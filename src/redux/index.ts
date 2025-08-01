@@ -6,6 +6,7 @@ import languageReducer from "@/features/languageSlice";
 import bannerReducer from '@/features/bannerSlice'
 import productReducer from '@/features/productSlice'
 import categoryReducer from "@/features/categorySlice";
+import toastReducer from "@/features/toastSlice"
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     banner: bannerReducer,
     products: productReducer,
     categories: categoryReducer,
+    toast: toastReducer,
   },
 });
 

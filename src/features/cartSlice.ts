@@ -5,71 +5,69 @@ interface CartState {
   items: CartItem[]
 }
 
-// Get initial cart from localStorage
-const getInitialCart = (): CartItem[] => {
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem("cart-items")
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch (error) {
-        console.error("Error parsing cart items from localStorage:", error)
-        return []
-      }
+const loadCartFromLocalStorage = (): CartItem[] => {
+  try {
+    const serializedCart = localStorage.getItem("cartItems")
+    if (serializedCart === null) {
+      return []
     }
+    return JSON.parse(serializedCart)
+  } catch (error) {
+    console.error("Error loading cart from localStorage:", error)
+    return []
   }
-  return []
+}
+
+const saveCartToLocalStorage = (cartItems: CartItem[]) => {
+  try {
+    const serializedCart = JSON.stringify(cartItems)
+    localStorage.setItem("cartItems", serializedCart)
+  } catch (error) {
+    console.error("Error saving cart to localStorage:", error)
+  }
 }
 
 const initialState: CartState = {
-  items: getInitialCart(),
+  items: loadCartFromLocalStorage(),
 }
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<CartItem>) => {
-      const existingItem = state.items.find(
-        (item) => item.id === action.payload.id && item.size === action.payload.size,
-      )
+    addItemToCart: (state, action: PayloadAction<CartItem>) => {
+      const newItem = action.payload
+      const existingItem = state.items.find((item) => item.id === newItem.id && item.size === newItem.size)
 
       if (existingItem) {
-        existingItem.quantity += action.payload.quantity
+        existingItem.quantity += newItem.quantity
       } else {
-        state.items.push(action.payload)
+        state.items.push(newItem)
       }
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("cart-items", JSON.stringify(state.items))
-      }
+      saveCartToLocalStorage(state.items)
     },
-    removeFromCart: (state, action: PayloadAction<{ id: string; size: number }>) => {
+    removeItemFromCart: (state, action: PayloadAction<{ id: string; size: number }>) => {
       state.items = state.items.filter((item) => !(item.id === action.payload.id && item.size === action.payload.size))
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("cart-items", JSON.stringify(state.items))
-      }
+      saveCartToLocalStorage(state.items)
     },
-    updateQuantity: (state, action: PayloadAction<{ id: string; size: number; quantity: number }>) => {
-      const item = state.items.find((item) => item.id === action.payload.id && item.size === action.payload.size)
-      if (item) {
-        item.quantity = action.payload.quantity
-        // Save to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("cart-items", JSON.stringify(state.items))
+    updateItemQuantity: (state, action: PayloadAction<{ id: string; size: number; quantity: number }>) => {
+      const { id, size, quantity } = action.payload
+      const existingItem = state.items.find((item) => item.id === id && item.size === size)
+
+      if (existingItem) {
+        existingItem.quantity = quantity
+        if (existingItem.quantity <= 0) {
+          state.items = state.items.filter((item) => !(item.id === id && item.size === size))
         }
       }
+      saveCartToLocalStorage(state.items)
     },
     clearCart: (state) => {
       state.items = []
-      // Clear from localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem("cart-items")
-      }
+      saveCartToLocalStorage(state.items)
     },
   },
 })
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, clearCart } = cartSlice.actions
 export default cartSlice.reducer

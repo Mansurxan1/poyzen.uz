@@ -9,8 +9,10 @@ import type { RootState, AppDispatch } from "./redux"
 import { initializeLanguage } from "@/features/languageSlice"
 import Home from "@/pages/Home/home"
 import ProductAll from "@/pages/productAll/ProductAll"
-import Likes from "@/pages/likes/likes" // Import Likes page
-import Search from "@/pages/Search/search" // Import Search page
+import Likes from "@/pages/likes/likes"
+import Search from "@/pages/Search/search"
+import ProductDetails from "@/pages/productDetails/ProductDetails" // Import ProductDetails
+import Cart from "@/pages/cart/cartPage" // Import Cart
 
 const App = () => {
   const dispatch: AppDispatch = useDispatch()
@@ -39,8 +41,12 @@ const App = () => {
           <Route path="/" element={<Navigate to={`/${currentLang}`} replace />} />
           <Route path="/:lang" element={<Home />} />
           <Route path="/:lang/products" element={<ProductAll />} />
-          <Route path="/:lang/likes" element={<Likes />} /> {/* Add Likes route */}
-          <Route path="/:lang/search" element={<Search />} /> {/* Add Search route */}
+          <Route path="/:lang/likes" element={<Likes />} />
+          <Route path="/:lang/search" element={<Search />} />
+          {/* Product Details Route */}
+          <Route path="/:lang/:brand/:nameUrl/:id" element={<ProductDetails />} />
+          {/* Cart Route */}
+          <Route path="/:lang/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to={`/${currentLang}`} replace />} />
         </Routes>
       </div>
@@ -49,4 +55,3 @@ const App = () => {
 }
 
 export default App
-

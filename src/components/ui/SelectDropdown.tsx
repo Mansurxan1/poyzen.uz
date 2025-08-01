@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react"
 import { FaChevronDown } from "react-icons/fa"
 import { useClickOutside } from "@/hooks/useClickOutside"
 import type { MultiSelectDropdownProps } from "@/types"
+import { useTranslation } from "react-i18next" // Import useTranslation
 
 const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   options,
@@ -16,6 +17,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   isOpen: controlledIsOpen, // Controlled prop for external state
   setIsOpen: controlledSetIsOpen, // Controlled setter for external state
 }) => {
+  const { t } = useTranslation() // Initialize useTranslation
   // Internal state, used if not controlled externally
   const [internalIsOpen, setInternalIsOpen] = useState(false)
 
@@ -86,7 +88,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
     selectedValues.length > 0
       ? selectedValues.length === 1
         ? options.find((opt) => opt.value === selectedValues[0])?.label || selectedValues[0]
-        : `${selectedValues.length} tanlangan`
+        : `${selectedValues.length} ${t("selected_count")}` // Use translation for "selected"
       : placeholder
 
   return (
@@ -114,7 +116,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                 value={searchTerm}
                 onChange={handleSearchChange}
                 onClick={handleSearchClick}
-                placeholder="Qidirish..."
+                placeholder={t("search_placeholder_dropdown")} // Use translation for search placeholder
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-700"
               />
             </div>
@@ -143,7 +145,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               </div>
             ))}
             {filteredOptions.length === 0 && (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">Hech narsa topilmadi</div>
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">{t("no_items_found")}</div>
             )}
           </div>
         </div>
