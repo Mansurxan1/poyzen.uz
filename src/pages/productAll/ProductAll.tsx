@@ -12,12 +12,15 @@ import type { AppDispatch } from "@/redux"
 import { useProductFilter } from "@/hooks/useProductFilter"
 import FilterSidebar from "./components/FilterSidebar"
 import ProductGrid from "./components/ProductGrid"
+import Button from "@/components/ui/button"
+
+const PRODUCTS_PER_PAGE = 25 // Har sahifada ko'rsatiladigan mahsulotlar soni
 
 const ProductAll: React.FC = () => {
   const { t } = useTranslation()
   const dispatch: AppDispatch = useDispatch()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  // openDropdown state is now managed within FilterSidebar
+  const [currentPage, setCurrentPage] = useState(1) // Paginatsiya uchun joriy sahifa
 
   const {
     filter,
@@ -41,6 +44,23 @@ const ProductAll: React.FC = () => {
     }
   }, [dispatch])
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  // Filtr o'zgarganda sahifani 1 ga qaytarish
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter])
+
+  // Paginatsiya logikasi
+  const indexOfLastProduct = currentPage * PRODUCTS_PER_PAGE
+  const indexOfFirstProduct = indexOfLastProduct - PRODUCTS_PER_PAGE
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -48,7 +68,7 @@ const ProductAll: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("all_products")}</h1>
             <p className="text-gray-600">
-              {filteredProducts.length} {t("products_found")}
+              {t("total_products")}: {filteredProducts.length}
             </p>
           </div>
 
@@ -66,8 +86,8 @@ const ProductAll: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-8">
-          <div className="hidden lg:block w-80 flex-shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+          <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-120px)] lg:overflow-y-auto">
             <FilterSidebar
               filter={filter}
               priceInput={priceInput}
@@ -76,14 +96,13 @@ const ProductAll: React.FC = () => {
               onFilterChange={handleFilterChange}
               onPriceChange={handlePriceChange}
               onClearAll={clearAllFilters}
-              // openDropdown and setOpenDropdown are no longer passed from here
+              currentProductCount={filteredProducts.length}
             />
           </div>
-
           {isFilterOpen && (
             <div className="lg:hidden fixed inset-0 z-30 bg-black bg-opacity-50">
-              <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl overflow-y-auto">
-                <div className="p-4 border-b border-gray-200">
+              <div className="absolute inset-0 w-full h-full bg-white shadow-2xl overflow-y-auto flex flex-col">
+                <div className="p-4 border-b border-gray-200 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{t("filters")}</h3>
                     <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
@@ -91,7 +110,7 @@ const ProductAll: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="p-4 flex-grow overflow-y-auto">
                   <FilterSidebar
                     filter={filter}
                     priceInput={priceInput}
@@ -100,28 +119,67 @@ const ProductAll: React.FC = () => {
                     onFilterChange={handleFilterChange}
                     onPriceChange={handlePriceChange}
                     onClearAll={clearAllFilters}
-                    // openDropdown and setOpenDropdown are no longer passed from here
+                    currentProductCount={filteredProducts.length}
                   />
+                </div>
+                <div className="p-4 border-t border-gray-200 flex-shrink-0">
+                  <Button
+                    onClick={() => setIsFilterOpen(false)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
+                  >
+                    {t("show_products")} ({filteredProducts.length})
+                  </Button>
                 </div>
               </div>
             </div>
           )}
-
           <div className="flex-1">
-            {filteredProducts.length > 0 ? (
-              <ProductGrid products={filteredProducts} title={t("filtered_products")} />
+            {currentProducts.length > 0 ? (
+              <>
+                <ProductGrid products={currentProducts} title={t("filtered_products")} />
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-8">
+                    <Button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      variant="outline"
+                      size="sm"
+                    >
+                      {t("previous")}
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        onClick={() => paginate(page)}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                    <Button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      variant="outline"
+                      size="sm"
+                    >
+                      {t("next")}
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <>
-                <div className="text-center py-8 mb-8">
+                <div className="text-center py-8 mb-8 bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                   <div className="text-gray-400 text-6xl mb-4">🔍</div>
                   <h3 className="text-xl font-semibold text-gray-600 mb-2">{t("no_products_found")}</h3>
                   <p className="text-gray-500 mb-4">{t("showing_similar_products")}</p>
-                  <button
+                  <Button
                     onClick={clearAllFilters}
                     className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     {t("clear_filters")}
-                  </button>
+                  </Button>
                 </div>
 
                 {similarProducts.length > 0 && <ProductGrid products={similarProducts} title={t("similar_products")} />}

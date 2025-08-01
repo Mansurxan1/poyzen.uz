@@ -4,6 +4,7 @@ import type React from "react"
 import { Link } from "react-router-dom"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination } from "swiper/modules"
+// @ts-expect-error - Swiper CSS module not found in types
 import "swiper/css/bundle"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { useTranslation } from "react-i18next"

@@ -3,6 +3,7 @@ import type { RootState } from "@/redux"
 import Banner from "./components/banner"
 import { Link } from "react-router-dom"
 import Last24HoursProducts from "./components/Last24Hours"
+import { useEffect } from "react"
 
 const brandLogos = [
   { id: "nike", name: "Nike", image: "https://1000logos.net/wp-content/uploads/2017/03/Nike-Logo.png" },
@@ -23,10 +24,18 @@ const brandLogos = [
 const Home = () => {
   const language = useSelector((state: RootState) => state.language.language)
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   return (
-    <main className="flex max-w-7xl mx-auto flex-col items-center">
-      <Banner />
-      <section className="w-full px-4 py-8">
+    <main className="flex flex-col items-center">
+      {" "}
+      {/* Removed max-w-7xl from main */}
+      <Banner /> {/* Banner is now full width */}
+      <section className="w-full px-4 py-8 max-w-7xl mx-auto">
+        {" "}
+        {/* Added max-w-7xl to sections */}
         <h2 className="text-2xl font-semibold mb-6 text-center">Mashhur Sneakers Brendlari</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 place-items-center">
           {brandLogos.slice(0, 9).map((brand) => (
@@ -46,7 +55,11 @@ const Home = () => {
           </Link>
         </div>
       </section>
-      <Last24HoursProducts />
+      <section className="w-full px-4 py-8 max-w-7xl mx-auto">
+        {" "}
+        {/* Added max-w-7xl to sections */}
+        <Last24HoursProducts />
+      </section>
     </main>
   )
 }

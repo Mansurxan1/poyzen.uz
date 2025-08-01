@@ -7,10 +7,6 @@ import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { FreeMode, Navigation, Thumbs } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/free-mode"
-import "swiper/css/navigation"
-import "swiper/css/thumbs"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { FaPlus, FaMinus, FaShoppingCart } from "react-icons/fa"
 import { FiCheck } from "react-icons/fi"
@@ -24,6 +20,7 @@ import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
 import type { Material } from "@/types" // Import Material type
 import type { Season } from "@/types" // Import Season type
+import type { Swiper as SwiperType } from "swiper"
 
 const ProductDetails: React.FC = () => {
   const { t } = useTranslation()
@@ -37,9 +34,13 @@ const ProductDetails: React.FC = () => {
   const categoriesData = useSelector((state: RootState) => state.categories)
   const cartItems = useSelector((state: RootState) => state.cart.items)
 
-  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null)
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [selectedSize, setSelectedSize] = useState<number | null>(null)
   const [quantity, setQuantity] = useState(1)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const currentProductVariant = useMemo(() => {
     if (!brand || !nameUrl || !id) return null
@@ -167,32 +168,9 @@ const ProductDetails: React.FC = () => {
     }
   }
 
-  const handleBuyNow = () => {
-    if (!selectedSizeDetails) {
-      dispatch(addToast({ message: t("select_size_error"), type: "warning" }))
-      return
-    }
-
-    if (!currentProductVariant) return
-
-    const message = `
-      ${t("product_code")}: ${currentProductVariant.id}
-      ${t("price")}: ${formatPrice(displayPrice)} ${currency.toUpperCase()}
-      ${t("discount")}: ${formatPrice(displayDiscount)} ${currency.toUpperCase()}
-      ${t("advance_payment_amount")}: ${formatPrice(advancePaymentAmount)} ${currency.toUpperCase()}
-      ${t("quantity")}: ${quantity}
-      ${t("size")}: ${selectedSizeDetails.size}
-      ${t("color")}: ${getColorName(currentProductVariant.color)}
-      ${t("image")}: ${currentProductVariant.images[0] || "/placeholder.svg"}
-    `.trim()
-
-    const telegramUrl = `https://t.me/998911382094?text=${encodeURIComponent(message)}`
-    window.open(telegramUrl, "_blank")
-    dispatch(addToast({ message: t("order_sent_telegram"), type: "success" }))
-  }
-
-  const handleToggleLike = () => {
-    toggleLike(currentProductVariant!.id)
+  const handleToggleLike = (e: React.MouseEvent) => {
+    if (!currentProductVariant || !currentProductVariant.product) return
+    toggleLike(currentProductVariant.id, currentProductVariant, currentProductVariant.product, e)
   }
 
   const getLocalizedName = (name: { uz: string; ru: string }) => {
@@ -202,11 +180,6 @@ const ProductDetails: React.FC = () => {
   const getColorName = (colorId: number) => {
     const color = categoriesData.colors.find((c: Color) => c.id === colorId)
     return color ? getLocalizedName(color.name) : t("unknown_color")
-  }
-
-  const getCategoryName = (categoryId: number) => {
-    const category = categoriesData.categories.find((c) => c.id === categoryId)
-    return category ? getLocalizedName(category.name) : t("unknown_category")
   }
 
   const getMaterialName = (materialId: number) => {
@@ -278,7 +251,7 @@ const ProductDetails: React.FC = () => {
               ))}
             </Swiper>
             <button
-              onClick={handleToggleLike}
+              onClick={(e) => handleToggleLike(e)}
               className={`absolute top-4 right-4 rounded-full p-2 shadow-md z-10 ${
                 isLiked(currentProductVariant.id) ? "bg-white border-none" : "bg-black border border-black"
               }`}
@@ -430,29 +403,15 @@ const ProductDetails: React.FC = () => {
                     <FaPlus className="w-4 h-4" />
                   </Button>
                 </div>
-                <Button
-                  onClick={handleBuyNow}
-                  disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
-                >
-                  {t("buy_now")}
-                </Button>
               </div>
             ) : (
               <div className="flex items-center gap-4">
                 <Button
                   onClick={handleAddToCart}
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
-                  <FaShoppingCart className="mr-2" /> {t("add_to_cart")}
-                </Button>
-                <Button
-                  onClick={handleBuyNow}
-                  disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
-                >
-                  {t("buy_now")}
+                  <FaShoppingCart className="mr-3 w-5 h-5" /> {t("add_to_cart")}
                 </Button>
               </div>
             )}

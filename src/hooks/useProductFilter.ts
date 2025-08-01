@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
 import type { FilterState, PriceInputState, FilterOptions, LocalizedText, DropdownOption } from "@/types"
@@ -48,9 +48,9 @@ export const useProductFilter = () => {
     setActiveFilters(count)
   }, [filter])
 
-  const getLocalizedName = (name: LocalizedText) => {
+  const getLocalizedName = useCallback((name: LocalizedText) => {
     return language === "uz" ? name.uz : name.ru
-  }
+  }, [language])
 
   // Get all variants with product info
   const allVariants = useMemo(() => {
@@ -108,10 +108,10 @@ export const useProductFilter = () => {
       genders: genders.map((gender) => ({ value: gender, label: t(gender.toLowerCase()) })).sort(sortAlphabetically),
       sizes: sizes.map((size) => ({ value: size.toString(), label: size.toString() })).sort(sortNumerically),
     }
-  }, [categories, colors, season, materials, allVariants, language, t])
+  }, [categories, colors, season, materials, allVariants, t, getLocalizedName])
 
   // Filter products based on criteria
-  const getFilteredProducts = (strict = true) => {
+  const getFilteredProducts = useCallback((strict = true) => {
     return allVariants
       .filter((variant) => {
         // Use the current currency for price filtering
@@ -143,12 +143,12 @@ export const useProductFilter = () => {
         }
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }
+  }, [allVariants, filter, currency])
 
-  const filteredProducts = useMemo(() => getFilteredProducts(true), [allVariants, filter, currency])
+  const filteredProducts = useMemo(() => getFilteredProducts(true), [getFilteredProducts])
   const similarProducts = useMemo(
     () => (filteredProducts.length === 0 ? getFilteredProducts(false).slice(0, 12) : []),
-    [filteredProducts, allVariants, filter, currency],
+    [filteredProducts, getFilteredProducts],
   )
 
   const handleFilterChange = (key: keyof FilterState, values: string[]) => {

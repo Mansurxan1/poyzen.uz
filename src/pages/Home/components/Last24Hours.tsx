@@ -11,7 +11,6 @@ import { Link } from "react-router-dom"
 import Button from "@/components/ui/button"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination } from "swiper/modules"
-import "swiper/css/bundle"
 import { useCurrency } from "@/hooks/useCurrency"
 import { addLike, removeLike } from "@/features/likesSlice" // Import Redux like actions
 import type { ProductVariant, Product } from "@/types" // Import Product type

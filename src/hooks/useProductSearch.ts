@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useCallback } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
 import type { ProductVariant, Category } from "@/types"
@@ -26,9 +26,9 @@ export const useProductSearch = (query: string) => {
     )
   }, [products])
 
-  const getLocalizedName = (name: { uz: string; ru: string }) => {
+  const getLocalizedName = useCallback((name: { uz: string; ru: string }) => {
     return language === "uz" ? name.uz : name.ru
-  }
+  }, [language])
 
   const searchResults = useMemo(() => {
     if (!debouncedQuery) return []
@@ -65,7 +65,7 @@ export const useProductSearch = (query: string) => {
 
     // Prioritize exact matches, then partial matches
     return [...new Set([...exactMatches, ...partialMatches])] // Use Set to remove duplicates
-  }, [debouncedQuery, allVariants, categories, language])
+  }, [debouncedQuery, allVariants, categories, getLocalizedName])
 
   const suggestedProducts = useMemo(() => {
     if (searchResults.length > 0) return [] // Don't suggest if there are search results
@@ -87,7 +87,7 @@ export const useProductSearch = (query: string) => {
         name: getLocalizedName(cat.name),
       }))
       .slice(0, 5) // Top 5 popular categories
-  }, [categories, language])
+  }, [categories, getLocalizedName])
 
   return {
     searchResults,

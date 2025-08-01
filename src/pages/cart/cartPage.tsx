@@ -12,14 +12,19 @@ import Button from "@/components/ui/button"
 import Input from "@/components/ui/input"
 import { useCurrency } from "@/hooks/useCurrency"
 import type { Color } from "@/types"
+import { useEffect } from "react"
 
-const Cart: React.FC = () => {
+const CartPage: React.FC = () => {
   const { t } = useTranslation()
   const dispatch: AppDispatch = useDispatch()
   const cartItems = useSelector((state: RootState) => state.cart.items)
   const language = useSelector((state: RootState) => state.language.language)
   const colors = useSelector((state: RootState) => state.categories.colors)
   const { currency, formatPrice } = useCurrency()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const getLocalizedName = (name: { uz: string; ru: string }) => {
     return language === "uz" ? name.uz : name.ru
@@ -209,4 +214,4 @@ const Cart: React.FC = () => {
   )
 }
 
-export default Cart
+export default CartPage

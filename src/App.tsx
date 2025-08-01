@@ -11,8 +11,10 @@ import Home from "@/pages/Home/home"
 import ProductAll from "@/pages/productAll/ProductAll"
 import Likes from "@/pages/likes/likes"
 import Search from "@/pages/Search/search"
-import ProductDetails from "@/pages/productDetails/ProductDetails" // Import ProductDetails
-import Cart from "@/pages/cart/cartPage" // Import Cart
+import ProductDetails from "@/pages/productDetails/ProductDetails"
+import Cart from "@/pages/cart/cartPage"
+import Brand from "@/pages/brand/brand"
+import BrandPage from "./pages/brandPage/brandPage"
 
 const App = () => {
   const dispatch: AppDispatch = useDispatch()
@@ -43,9 +45,9 @@ const App = () => {
           <Route path="/:lang/products" element={<ProductAll />} />
           <Route path="/:lang/likes" element={<Likes />} />
           <Route path="/:lang/search" element={<Search />} />
-          {/* Product Details Route */}
           <Route path="/:lang/:brand/:nameUrl/:id" element={<ProductDetails />} />
-          {/* Cart Route */}
+          <Route path="/:lang/brand" element={<Brand />} />
+          <Route path="/:lang/brand/:brandId" element={<BrandPage />} />
           <Route path="/:lang/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to={`/${currentLang}`} replace />} />
         </Routes>

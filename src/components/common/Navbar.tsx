@@ -1,7 +1,5 @@
-"use client"
-
 import React from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa"
 import { useTranslation } from "react-i18next"
 import { useSelector, useDispatch } from "react-redux"
@@ -9,19 +7,20 @@ import type { RootState, AppDispatch } from "@/redux"
 import { setCurrency } from "@/features/currencySlice"
 import { setLanguage } from "@/features/languageSlice"
 import SearchBar from "@/components/common/SearchBar"
-import Dropdown from "@/components/ui/dropdown"
-import Button from "@/components/ui/button"
+import Dropdown from "@/components/ui/dropdown" 
+import Button from "@/components/ui/button" 
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const dispatch: AppDispatch = useDispatch()
   const currentLang = useSelector((state: RootState) => state.language.language)
   const currentCurrency = useSelector((state: RootState) => state.currency.currency)
   const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
-  const cartItems = useSelector((state: RootState) => state.cart.items) // Get cart items from Redux
+  const cartItems = useSelector((state: RootState) => state.cart.items)
   const likeCount = likedProducts.length
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0) // Calculate total cart quantity
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
@@ -67,11 +66,18 @@ const Navbar: React.FC = () => {
 
   const handleLikesClick = () => {
     navigate(`/${currentLang}/likes`)
+    setIsMobileMenuOpen(false) // Menyu ochiq bo'lsa, navigatsiyadan keyin yopish
   }
 
-  const handleCartClick = () => navigate(`/${currentLang}/cart`)
+  const handleCartClick = () => {
+    navigate(`/${currentLang}/cart`)
+    setIsMobileMenuOpen(false) // Menyu ochiq bo'lsa, navigatsiyadan keyin yopish
+  }
 
-  const handleProfileClick = () => navigate(`/${currentLang}/profile`)
+  const handleProfileClick = () => {
+    window.open("https://www.google.com", "_blank") // Google sahifasiga yo'naltirish
+    setIsMobileMenuOpen(false) // Menyu ochiq bo'lsa, navigatsiyadan keyin yopish
+  }
 
   return (
     <div className="sticky top-0 z-50">
@@ -92,7 +98,13 @@ const Navbar: React.FC = () => {
                   <Link
                     key={link.to}
                     to={`/${currentLang}${link.to}`}
-                    className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative group"
+                    className={
+                      "text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative group" +
+                      (location.pathname === `/${currentLang}${link.to}` ||
+                      (link.to === "/" && location.pathname === `/${currentLang}`) // Home sahifasi uchun ham aktiv holatni tekshirish
+                        ? " bg-blue-100 text-blue-700"
+                        : "")
+                    }
                   >
                     {link.label}
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
@@ -100,7 +112,7 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button onClick={toggleSearch} variant="ghost" size="icon">
                 <FaSearch className="h-5 w-5" />
               </Button>
@@ -120,40 +132,92 @@ const Navbar: React.FC = () => {
                   </span>
                 )}
               </Button>
-              <Dropdown
-                options={currencyOptions}
-                placeholder={currentCurrency.toUpperCase()}
-                onSelect={handleCurrencyChange}
-                initialValue={currentCurrency}
-              />
-              <Dropdown
-                options={languageOptions}
-                placeholder={t("language")}
-                onSelect={handleLanguageChange}
-                initialValue={currentLang}
-              />
-              <Button onClick={handleProfileClick} variant="outline" size="icon">
-                <FaUser className="h-5 w-5" />
-              </Button>
+              {/* Currency and Language dropdowns for desktop/tablet */}
+              <div className="hidden lg:flex items-center gap-2">
+                <Dropdown
+                  options={currencyOptions}
+                  placeholder={currentCurrency.toUpperCase()}
+                  onSelect={handleCurrencyChange}
+                  initialValue={currentCurrency}
+                  className="w-20 sm:w-24 md:w-32"
+                />
+                <Dropdown
+                  options={languageOptions}
+                  placeholder={t("language")}
+                  onSelect={handleLanguageChange}
+                  initialValue={currentLang}
+                  className="w-20 sm:w-24 md:w-32"
+                />
+                <Button onClick={handleProfileClick} variant="outline" size="icon" className="bg-transparent">
+                  <FaUser className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Hamburger menu button for mobile */}
               <Button onClick={toggleMobileMenu} variant="ghost" size="icon" className="lg:hidden">
                 {isMobileMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
               </Button>
             </div>
           </div>
         </div>
+        {/* Custom Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-3 space-y-2 max-w-7xl mx-auto">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={`/${currentLang}${link.to}`}
-                  onClick={toggleMobileMenu}
-                  className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-base font-medium"
-                >
-                  {link.label}
-                </Link>
-              ))}
+          <div
+            className="fixed inset-0 z-50 bg-black bg-opacity-50 lg:hidden transition-opacity duration-300 ease-in-out"
+            onClick={toggleMobileMenu} // Overlay bosilganda menyuni yopish
+          >
+            <div
+              className={`absolute top-0 left-0 w-full sm:max-w-xs h-full bg-white shadow-lg transition-transform duration-300 ease-in-out transform ${
+                isMobileMenuOpen ? "translate-x-0" : "-translate-x-full" // Chapdan ochilish/yopilish animatsiyasi
+              }`}
+              onClick={(e) => e.stopPropagation()} // Menyuning ichiga bosilganda yopilmasligi uchun
+            >
+              <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 className="text-xl font-bold text-gray-900">{t("menu")}</h2>
+                <Button onClick={toggleMobileMenu} variant="ghost" size="icon">
+                  <FaTimes className="h-6 w-6 text-gray-600" />
+                </Button>
+              </div>
+              <div className="px-4 py-3 space-y-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={`/${currentLang}${link.to}`}
+                    onClick={toggleMobileMenu} // Havola bosilganda menyuni yopish
+                    className={
+                      "block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-base font-medium" +
+                      (location.pathname === `/${currentLang}${link.to}` ||
+                      (link.to === "/" && location.pathname === `/${currentLang}`)
+                        ? " bg-blue-100 text-blue-700"
+                        : "")
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="pt-4 border-t border-gray-100 space-y-3">
+                  <Dropdown
+                    options={currencyOptions}
+                    placeholder={currentCurrency.toUpperCase()}
+                    onSelect={handleCurrencyChange}
+                    initialValue={currentCurrency}
+                    className="w-full"
+                  />
+                  <Dropdown
+                    options={languageOptions}
+                    placeholder={t("language")}
+                    onSelect={handleLanguageChange}
+                    initialValue={currentLang}
+                    className="w-full"
+                  />
+                  <Link
+                    to={`/${currentLang}/profile`}
+                    onClick={handleProfileClick} // Profil ikonasi bosilganda Google sahifasiga yo'naltirish
+                    className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-base font-medium"
+                  >
+                    <FaUser className="h-5 w-5" /> {t("profile")}
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -164,4 +228,3 @@ const Navbar: React.FC = () => {
 }
 
 export default Navbar
- 

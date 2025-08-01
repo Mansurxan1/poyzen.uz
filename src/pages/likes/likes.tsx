@@ -7,11 +7,16 @@ import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import ProductCard from "@/pages/productAll/components/ProductCard"
 import Button from "@/components/ui/button"
+import { useEffect } from "react"
 
 const Likes: React.FC = () => {
   const { t } = useTranslation()
   const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
   const language = useSelector((state: RootState) => state.language.language)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 max-w-7xl mx-auto">

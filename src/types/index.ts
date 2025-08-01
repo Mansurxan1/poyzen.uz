@@ -122,6 +122,7 @@ export interface DropdownProps {
   placeholder?: string
   onSelect?: (value: string) => void
   initialValue?: string
+  className?: string
 }
 
 export interface MultiSelectDropdownProps {

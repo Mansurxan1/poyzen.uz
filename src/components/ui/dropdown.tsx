@@ -6,7 +6,13 @@ import { FaChevronDown } from "react-icons/fa"
 import { useClickOutside } from "@/hooks/useClickOutside"
 import type { DropdownProps } from "@/types"
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = "Tanlang", onSelect, initialValue }) => {
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  placeholder = "Tanlang",
+  onSelect,
+  initialValue,
+  className = "",
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
@@ -24,7 +30,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = "Tanlang", o
   }
 
   return (
-    <div className="relative w-52" ref={dropdownRef}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}

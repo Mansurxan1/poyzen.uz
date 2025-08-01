@@ -3,7 +3,7 @@
 import type React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { removeToast, type Toast as ToastType } from "@/redux/toastSlice"
+import { removeToast, type Toast as ToastType } from "@/features/toastSlice"
 import { FiCheckCircle, FiXCircle, FiInfo, FiAlertTriangle } from "react-icons/fi"
 
 interface ToastProps {
