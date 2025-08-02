@@ -59,14 +59,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ variant }) => {
 
         <button
           onClick={(e) => toggleLike(variant.id, variant, variant.product!, e)}
-          className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 ${
-            isLiked(variant.id) ? "bg-white border-none" : ""
+          className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 transition-all duration-300 ease-in-out transform hover:scale-110 ${
+            isLiked(variant.id) 
+              ? "bg-white border-none shadow-lg scale-110" 
+              : "bg-white/80 hover:bg-white"
           }`}
         >
           {isLiked(variant.id) ? (
-            <AiFillHeart className="w-5 h-5 text-teal-400" />
+            <AiFillHeart className="w-5 h-5 text-teal-400 animate-pulse" />
           ) : (
-            <AiOutlineHeart className="w-5 h-5" />
+            <AiOutlineHeart className="w-5 h-5 text-gray-600 hover:text-teal-400 transition-colors duration-200" />
           )}
         </button>
       </div>

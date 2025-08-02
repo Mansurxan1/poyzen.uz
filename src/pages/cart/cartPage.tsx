@@ -5,7 +5,7 @@ import { removeItemFromCart, updateItemQuantity, clearCart } from "@/features/ca
 import { addToast } from "@/features/toastSlice" // Import addToast
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
-import { FaPlus, FaMinus, FaTrash } from "react-icons/fa"
+import { FaPlus, FaMinus, FaTrash, FaShoppingCart, FaHome, FaCreditCard, FaTruck, FaShieldAlt } from "react-icons/fa"
 import Button from "@/components/ui/button"
 import Input from "@/components/ui/input"
 import { useCurrency } from "@/hooks/useCurrency"
@@ -21,7 +21,7 @@ const CartPage: React.FC = () => {
   const { currency, formatPrice } = useCurrency()
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
   const getLocalizedName = (name: { uz: string; ru: string }) => {
@@ -58,23 +58,46 @@ const CartPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">{t("shoppingCart")}</h1>
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+          <FaShoppingCart className="w-8 h-8 text-blue-600" />
+        </div>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">{t("shoppingCart")}</h1>
+        <p className="text-xl text-gray-600">
+          {cartItems.length} {t("items")}
+        </p>
+      </div>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🛒</div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">{t("emptyCart")}</h3>
-          <p className="text-gray-500 mb-6">{t("addItemsToCart")}</p>
-          <Link to={`/${language}/products`}>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg">
-              {t("browseProducts")}
-            </Button>
-          </Link>
+        <div className="text-center py-12 bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
+            <FaShoppingCart className="w-10 h-10 text-gray-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-700 mb-3">{t("emptyCart")}</h3>
+          <p className="text-gray-500 mb-8 text-lg">{t("addItemsToCart")}</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to={`/${language}/products`}>
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+                <FaShoppingCart className="w-5 h-5 mr-2" />
+                {t("browseProducts")}
+              </Button>
+            </Link>
+            <Link to={`/${language}`}>
+              <Button variant="outline" className="px-8 py-3 rounded-lg bg-transparent border-2 border-gray-300 hover:border-gray-400 text-lg font-semibold transition-all duration-200">
+                <FaHome className="w-5 h-5 mr-2" />
+                {t("back_to_home")}
+              </Button>
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items List */}
           <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+            <div className="flex items-center gap-3 mb-6">
+              <FaShoppingCart className="w-6 h-6 text-blue-600" />
+              <h2 className="text-2xl font-bold text-gray-800">{t("cart_items")}</h2>
+            </div>
             <div className="grid grid-cols-[1fr_auto_auto_auto] md:grid-cols-[2fr_1fr_1fr_auto] gap-4 pb-4 border-b border-gray-200 font-semibold text-gray-700">
               <div>{t("product_code")}</div>
               <div className="text-center">{t("quantity")}</div>
@@ -141,19 +164,19 @@ const CartPage: React.FC = () => {
               )
             })}
             <div className="mt-6 flex justify-between">
-              <Button variant="outline" onClick={handleClearCart} className="bg-transparent">
+              <Button variant="outline" onClick={handleClearCart} className="bg-transparent border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors duration-200">
+                <FaTrash className="w-4 h-4 mr-2" />
                 {t("clearCart")}
               </Button>
-              {/* Update Cart button can be added here if needed for more complex logic */}
-              {/* <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg">
-                {t("update_cart")}
-              </Button> */}
             </div>
           </div>
 
           {/* Order Summary */}
           <div className="w-full lg:w-80 bg-white rounded-2xl shadow-xl p-6 border border-gray-100 flex-shrink-0">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">{t("orderSummary")}</h2>
+            <div className="flex items-center gap-3 mb-6">
+              <FaCreditCard className="w-6 h-6 text-green-600" />
+              <h2 className="text-xl font-bold text-gray-800">{t("orderSummary")}</h2>
+            </div>
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-2">
                 <Input type="text" placeholder={t("discount_voucher")} className="flex-1" />
@@ -193,16 +216,22 @@ const CartPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="text-sm text-gray-500 mb-6">
-              <p className="flex items-center gap-1">
-                <span className="text-green-500">✔</span> {t("90_day_warranty")}
+            <div className="text-sm text-gray-500 mb-6 space-y-2">
+              <p className="flex items-center gap-2">
+                <FaTruck className="w-4 h-4 text-green-500" />
+                <span>{t("free_delivery")}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <FaShieldAlt className="w-4 h-4 text-blue-500" />
+                <span>{t("90_day_warranty")}</span>
                 <Link to={`/${language}/warranty-details`} className="text-blue-600 hover:underline ml-1">
                   {t("details")}
                 </Link>
               </p>
             </div>
 
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+              <FaCreditCard className="w-5 h-5 mr-2" />
               {t("proceedToCheckout")}
             </Button>
           </div>

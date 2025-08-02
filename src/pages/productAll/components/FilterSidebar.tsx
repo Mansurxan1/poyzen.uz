@@ -148,7 +148,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
+    <div className="bg-white p-4 rounded-lg shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <AiOutlineFilter className="w-5 h-5" />

@@ -162,7 +162,7 @@ const Navbar: React.FC = () => {
         {/* Custom Mobile Menu */}
         {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 z-50 bg-black bg-opacity-50 lg:hidden transition-opacity duration-300 ease-in-out"
+            className="fixed inset-0 z-50 bg-black/50 bg-opacity-50 lg:hidden transition-opacity duration-300 ease-in-out"
             onClick={toggleMobileMenu} // Overlay bosilganda menyuni yopish
           >
             <div

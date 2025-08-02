@@ -5,6 +5,9 @@ import { setCurrency } from "@/features/currencySlice"
 import { setLanguage } from "@/features/languageSlice"
 import { AiOutlineFilter, AiOutlineClose } from "react-icons/ai"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/redux"
 import i18n from "@/i18n/i18n"
 import type { AppDispatch } from "@/redux"
 import { useProductFilter } from "@/hooks/useProductFilter"
@@ -17,6 +20,7 @@ const PRODUCTS_PER_PAGE = 25 // Har sahifada ko'rsatiladigan mahsulotlar soni
 const ProductAll: React.FC = () => {
   const { t } = useTranslation()
   const dispatch: AppDispatch = useDispatch()
+  const language = useSelector((state: RootState) => state.language.language)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1) // Paginatsiya uchun joriy sahifa
 
@@ -86,8 +90,8 @@ const ProductAll: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-          <div className="hidden lg:block lg:sticky lg:top-4 p-4 lg:self-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
+          <div className="hidden lg:block lg:sticky lg:top-4 pl-4 lg:self-start">
             <FilterSidebar
               filter={filter}
               priceInput={priceInput}
@@ -170,16 +174,26 @@ const ProductAll: React.FC = () => {
               </>
             ) : (
               <>
-                <div className="text-center py-8 mb-8 bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                  <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">{t("no_products_found")}</h3>
-                  <p className="text-gray-500 mb-4">{t("showing_similar_products")}</p>
-                  <Button
-                    onClick={clearAllFilters}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    {t("clear_filters")}
-                  </Button>
+                <div className="text-center py-12 mb-8 bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+                  <div className="text-gray-400 text-8xl mb-6">🔍</div>
+                  <h3 className="text-2xl font-bold text-gray-700 mb-3">{t("no_products_found")}</h3>
+                  <p className="text-gray-500 mb-6 text-lg">{t("showing_similar_products")}</p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button
+                      onClick={clearAllFilters}
+                      className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold"
+                    >
+                      {t("clear_filters")}
+                    </Button>
+                    <Link to={`/${language}/search?q=`}>
+                      <Button
+                        variant="outline"
+                        className="border-blue-500 text-blue-500 hover:bg-blue-50 px-8 py-3 rounded-lg transition-colors text-lg font-semibold"
+                      >
+                        🔍 {t("search_products")}
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
 
                 {similarProducts.length > 0 && <ProductGrid products={similarProducts} title={t("similar_products")} />}

@@ -138,14 +138,16 @@ const Last24HoursProducts = () => {
                 )}
                 <button
                   onClick={(e) => toggleLike(item.id, item, item.product, e)}
-                  className={`absolute cursor-pointer top-2 right-2 rounded-full shadow p-2 z-10 ${
-                    isItemLiked ? "bg-white border-none" : ""
+                  className={`absolute cursor-pointer top-2 right-2 rounded-full shadow p-2 z-10 transition-all duration-300 ease-in-out transform hover:scale-110 ${
+                    isItemLiked 
+                      ? "bg-white border-none shadow-lg scale-110" 
+                      : "bg-white/80 hover:bg-white"
                   }`}
                 >
                   {isItemLiked ? (
-                    <AiFillHeart className="w-5 h-5 text-teal-400" aria-label="unlike" />
+                    <AiFillHeart className="w-5 h-5 text-teal-400 animate-pulse" aria-label="unlike" />
                   ) : (
-                    <AiOutlineHeart className="w-5 h-5" aria-label="like" />
+                    <AiOutlineHeart className="w-5 h-5 text-gray-600 hover:text-teal-400 transition-colors duration-200" aria-label="like" />
                   )}
                 </button>
               </div>
