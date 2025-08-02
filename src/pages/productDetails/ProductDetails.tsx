@@ -16,8 +16,7 @@ import type { Color } from "@/types"
 import type { ProductSize as ProductSizeType, ProductVariant as ProductVariantType } from "@/types"
 import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
-import type { Material } from "@/types" // Import Material type
-import type { Season } from "@/types" // Import Season type
+import type { Material, Season } from "@/types"
 import type { Swiper as SwiperType } from "swiper"
 
 const ProductDetails: React.FC = () => {
