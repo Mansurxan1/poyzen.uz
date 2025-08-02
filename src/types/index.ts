@@ -152,6 +152,7 @@ export interface FilterState {
   sizes: string[]
   priceMin: number
   priceMax: number
+  bestDeals: boolean
 }
 
 export interface PriceInputState {

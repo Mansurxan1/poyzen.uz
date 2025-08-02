@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
@@ -20,7 +18,6 @@ const BrandPage = () => {
   const brandProducts = React.useMemo(() => {
     if (!brandId) return []
     
-    // Brand ID ni to'g'ri formatda olish (katta harf bilan)
     const brandKey = brandId.charAt(0).toUpperCase() + brandId.slice(1).toLowerCase()
     const brandData = productsData[brandKey]
     
@@ -47,7 +44,7 @@ const BrandPage = () => {
   const brandKey = brandId.charAt(0).toUpperCase() + brandId.slice(1).toLowerCase()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 sm:px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center capitalize">
           {brandKey} {t("products")}
@@ -58,7 +55,7 @@ const BrandPage = () => {
             <p className="text-xl">{t("no_products_found_for_brand")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 auto-rows-fr">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr">
             {brandProducts.map((variant) => (
               <ProductCard key={variant.id} variant={variant} />
             ))}

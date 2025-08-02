@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { useSelector, useDispatch } from "react-redux" // Import useDispatch
@@ -13,11 +11,11 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination } from "swiper/modules"
 import { useCurrency } from "@/hooks/useCurrency"
 import { addLike, removeLike } from "@/features/likesSlice" // Import Redux like actions
-import type { ProductVariant, Product } from "@/types" // Import Product type
+import type { ProductVariant, Product } from "@/types" 
 
 const Last24HoursProducts = () => {
   const { t } = useTranslation()
-  const dispatch: AppDispatch = useDispatch() // Initialize useDispatch
+  const dispatch: AppDispatch = useDispatch() 
   const products = useSelector((state: RootState) => state.products.data)
   const { currency, formatPrice } = useCurrency()
   const lang = useSelector((state: RootState) => state.language.language)
@@ -101,25 +99,25 @@ const Last24HoursProducts = () => {
   }
 
   return (
-    <section className="w-full px-4 py-8">
+    <section className="w-full sm:px-4 py-8">
       <h2 className="text-xl font-bold mb-4 text-center">
         {t("new_arrivals")} ({t("last_24_hours")})
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 auto-rows-fr">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr">
         {last24HourVariants.map((item) => {
           const isItemLiked = likedProducts.some((likedItem) => likedItem.id === item.id)
           return (
             <Link
               key={item.id}
               to={`/${lang}/${item.brand}/${item.nameUrl}/${item.id}`}
-              className="border rounded-lg overflow-hidden shadow-sm relative"
+              className="border border-gray-100 overflow-hidden shadow-sm relative"
             >
               <div className="relative">
                 <Swiper modules={[Pagination]} pagination={{ clickable: true }} loop={true} className="w-full h-48">
                   {item.images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <img
-                        src={image || "/placeholder.svg"}
+                        src={image}
                         alt={`${item.productName} ${index + 1}`}
                         className="w-full h-48 object-cover"
                       />
@@ -140,14 +138,14 @@ const Last24HoursProducts = () => {
                 )}
                 <button
                   onClick={(e) => toggleLike(item.id, item, item.product, e)}
-                  className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 ${
-                    isItemLiked ? "bg-white border-none" : "bg-black border border-black"
+                  className={`absolute cursor-pointer top-2 right-2 rounded-full shadow p-2 z-10 ${
+                    isItemLiked ? "bg-white border-none" : ""
                   }`}
                 >
                   {isItemLiked ? (
                     <AiFillHeart className="w-5 h-5 text-teal-400" aria-label="unlike" />
                   ) : (
-                    <AiOutlineHeart className="w-5 h-5 text-white" aria-label="like" />
+                    <AiOutlineHeart className="w-5 h-5" aria-label="like" />
                   )}
                 </button>
               </div>

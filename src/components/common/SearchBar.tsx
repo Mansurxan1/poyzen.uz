@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useRef, useEffect, useState } from "react"
 import { FiSearch, FiX } from "react-icons/fi"

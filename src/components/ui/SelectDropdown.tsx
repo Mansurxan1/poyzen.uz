@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState, useMemo, useEffect } from "react"
 import { FaChevronDown, FaSearch } from "react-icons/fa"

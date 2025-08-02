@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useLocation, Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"

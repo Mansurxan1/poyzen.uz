@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { Link } from "react-router-dom"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -32,14 +30,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ variant }) => {
   return (
     <Link
       to={`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`}
-      className="border rounded-lg overflow-hidden shadow-sm relative hover:shadow-md transition-shadow"
+      className="border border-gray-100 overflow-hidden shadow-sm relative hover:shadow-md transition-shadow"
     >
       <div className="relative">
         <Swiper modules={[Pagination]} pagination={{ clickable: true }} loop={true} className="w-full h-48">
           {variant.images.map((image: string, index: number) => (
             <SwiperSlide key={index}>
               <img
-                src={image || "/placeholder.svg"}
+                src={image}
                 alt={`${variant.nameUrl} ${index + 1}`}
                 className="w-full h-48 object-cover"
               />
@@ -48,7 +46,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ variant }) => {
         </Swiper>
 
         {variant.sizes[0].discount[currency] < variant.sizes[0].price[currency] && (
-          <div className="absolute top-2 left-2 z-50 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
+          <div className="absolute top-2 left-2 z-10 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
             -
             {Math.round(
               ((variant.sizes[0].price[currency] - variant.sizes[0].discount[currency]) /
@@ -62,13 +60,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ variant }) => {
         <button
           onClick={(e) => toggleLike(variant.id, variant, variant.product!, e)}
           className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 ${
-            isLiked(variant.id) ? "bg-white border-none" : "bg-black border border-black"
+            isLiked(variant.id) ? "bg-white border-none" : ""
           }`}
         >
           {isLiked(variant.id) ? (
             <AiFillHeart className="w-5 h-5 text-teal-400" />
           ) : (
-            <AiOutlineHeart className="w-5 h-5 text-white" />
+            <AiOutlineHeart className="w-5 h-5" />
           )}
         </button>
       </div>

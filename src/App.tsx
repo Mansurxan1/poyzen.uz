@@ -1,5 +1,3 @@
-"use client"
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Navbar from "./components/common/Navbar"
 import i18n from "./i18n/i18n"

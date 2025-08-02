@@ -1,10 +1,8 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 import { AiOutlineFilter } from "react-icons/ai"
+import { FaChevronUp, FaSearch } from "react-icons/fa"
 import { useTranslation } from "react-i18next"
-import MultiSelectDropdown from "@/components/ui/SelectDropdown"
 import Input from "@/components/ui/input"
 import Button from "@/components/ui/button"
 import type { FilterState, PriceInputState, FilterOptions } from "@/types"
@@ -20,6 +18,111 @@ interface FilterSidebarProps {
   currentProductCount: number
 }
 
+interface FilterSectionProps {
+  title: string
+  options: { value: string; label: string; color?: string }[]
+  selectedValues: string[]
+  onSelect: (values: string[]) => void
+  enableSearch?: boolean
+}
+
+const FilterSection: React.FC<FilterSectionProps> = ({
+  title,
+  options,
+  selectedValues,
+  onSelect,
+  enableSearch = true,
+}) => {
+  const { t } = useTranslation()
+  const [isOpen, setIsOpen] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showAll, setShowAll] = useState(false)
+
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const displayedOptions = showAll ? filteredOptions : filteredOptions.slice(0, 5)
+
+  const handleSelect = (value: string) => {
+    const newSelectedValues = selectedValues.includes(value)
+      ? selectedValues.filter((v) => v !== value)
+      : [...selectedValues, value]
+    
+    onSelect(newSelectedValues)
+  }
+
+  return (
+    <div className="border-b border-gray-200 pb-4 mb-4">
+      <div 
+        className="flex items-center justify-between cursor-pointer mb-3"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <h4 className="text-lg font-semibold text-gray-800">{title}</h4>
+        <FaChevronUp 
+          className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
+            isOpen ? "rotate-0" : "rotate-180"
+          }`}
+        />
+      </div>
+
+      {isOpen && (
+        <div className="space-y-3">
+          {enableSearch && (
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder={t("search")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50"
+              />
+            </div>
+          )}
+
+          <div 
+            className={`space-y-2 ${showAll && filteredOptions.length > 8 ? 'max-h-48 overflow-y-auto custom-scrollbar' : ''}`}
+          >
+            {displayedOptions.map((option) => (
+              <div
+                key={option.value}
+                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors duration-150"
+                onClick={() => handleSelect(option.value)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(option.value)}
+                  onChange={() => {}} // Handled by parent click
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <div className="flex items-center gap-2">
+                  {option.color && (
+                    <div
+                      className="w-4 h-4 rounded-full border border-gray-300"
+                      style={{ backgroundColor: option.color }}
+                    />
+                  )}
+                  <span className="text-sm text-gray-600">{option.label}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredOptions.length > 5 && (
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors duration-150"
+            >
+              {showAll ? t("show_less") : t("show_all")}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
   filter,
   priceInput,
@@ -28,20 +131,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onFilterChange,
   onPriceChange,
   onClearAll,
-  currentProductCount,
 }) => {
   const { t } = useTranslation()
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
-  const handleSetDropdownOpen = (dropdownName: string, open: boolean) => {
-    if (open) {
-      setOpenDropdown(dropdownName)
-    } else if (openDropdown === dropdownName) {
-      setOpenDropdown(null)
-    }
-  }
-
-  // Faqat raqamlar kiritishga ruxsat berish va 0 dan pastga tushmaslik
   const handlePriceInputChange = (type: "min" | "max", e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     // Faqat raqamlar va bo'sh stringga ruxsat berish
@@ -56,14 +148,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+    <div className="bg-white p-6 rounded-lg shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <AiOutlineFilter className="w-5 h-5" />
           {t("filters")}
-          {currentProductCount > 0 && (
-            <span className="ml-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1">{currentProductCount}</span>
-          )}
         </h3>
         {activeFilters > 0 && (
           <Button onClick={onClearAll} variant="ghost" className="text-sm text-red-500 hover:text-red-700 font-medium">
@@ -72,24 +161,24 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Price Range */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
+        <div className="border-b border-gray-200 pb-4 mb-4">
           <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("price_range")}</h4>
           <div className="space-y-3">
             <Input
-              type="text" // type="text" qilib o'zgartirildi
-              inputMode="numeric" // Faqat raqamli klaviaturani ochish uchun
-              pattern="[0-9]*" // Faqat raqamlarni qabul qilish uchun
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder={t("min_price")}
               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
               value={priceInput.min}
               onChange={(e) => handlePriceInputChange("min", e)}
             />
             <Input
-              type="text" // type="text" qilib o'zgartirildi
-              inputMode="numeric" // Faqat raqamli klaviaturani ochish uchun
-              pattern="[0-9]*" // Faqat raqamlarni qabul qilish uchun
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder={t("max_price")}
               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-700"
               value={priceInput.max}
@@ -99,106 +188,67 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
 
         {/* Brands */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("brands")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.brands}
-            placeholder={t("select_brand")}
-            onSelect={(values) => onFilterChange("brands", values)}
-            initialValues={filter.brands}
-            enableSearch={true}
-            closeOnSelect={false}
-            isOpen={openDropdown === "brands"}
-            setIsOpen={(open) => handleSetDropdownOpen("brands", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("brands")}
+          options={filterOptions.brands}
+          selectedValues={filter.brands}
+          onSelect={(values) => onFilterChange("brands", values)}
+          enableSearch={true}
+        />
 
         {/* Categories */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("categories")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.categories}
-            placeholder={t("select_category")}
-            onSelect={(values) => onFilterChange("categories", values)}
-            initialValues={filter.categories}
-            enableSearch={true}
-            closeOnSelect={false}
-            isOpen={openDropdown === "categories"}
-            setIsOpen={(open) => handleSetDropdownOpen("categories", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("categories")}
+          options={filterOptions.categories}
+          selectedValues={filter.categories}
+          onSelect={(values) => onFilterChange("categories", values)}
+          enableSearch={true}
+        />
 
         {/* Materials */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("materials")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.materials}
-            placeholder={t("select_material")}
-            onSelect={(values) => onFilterChange("materials", values)}
-            initialValues={filter.materials}
-            enableSearch={true}
-            closeOnSelect={false}
-            isOpen={openDropdown === "materials"}
-            setIsOpen={(open) => handleSetDropdownOpen("materials", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("materials")}
+          options={filterOptions.materials}
+          selectedValues={filter.materials}
+          onSelect={(values) => onFilterChange("materials", values)}
+          enableSearch={true}
+        />
 
         {/* Colors */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("colors")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.colors}
-            placeholder={t("select_color")}
-            onSelect={(values) => onFilterChange("colors", values)}
-            initialValues={filter.colors}
-            enableSearch={true}
-            closeOnSelect={false}
-            isOpen={openDropdown === "colors"}
-            setIsOpen={(open) => handleSetDropdownOpen("colors", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("colors")}
+          options={filterOptions.colors}
+          selectedValues={filter.colors}
+          onSelect={(values) => onFilterChange("colors", values)}
+          enableSearch={true}
+        />
 
         {/* Seasons */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("seasons")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.seasons}
-            placeholder={t("select_season")}
-            onSelect={(values) => onFilterChange("seasons", values)}
-            initialValues={filter.seasons}
-            closeOnSelect={false}
-            isOpen={openDropdown === "seasons"}
-            setIsOpen={(open) => handleSetDropdownOpen("seasons", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("seasons")}
+          options={filterOptions.seasons}
+          selectedValues={filter.seasons}
+          onSelect={(values) => onFilterChange("seasons", values)}
+          enableSearch={false}
+        />
 
         {/* Gender */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("genders")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.genders}
-            placeholder={t("select_gender")}
-            onSelect={(values) => onFilterChange("genders", values)}
-            initialValues={filter.genders}
-            closeOnSelect={false}
-            isOpen={openDropdown === "genders"}
-            setIsOpen={(open) => handleSetDropdownOpen("genders", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("genders")}
+          options={filterOptions.genders}
+          selectedValues={filter.genders}
+          onSelect={(values) => onFilterChange("genders", values)}
+          enableSearch={false}
+        />
 
         {/* Sizes */}
-        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-          <h4 className="text-lg font-semibold mb-3 text-gray-800">{t("sizes")}</h4>
-          <MultiSelectDropdown
-            options={filterOptions.sizes}
-            placeholder={t("select_size")}
-            onSelect={(values) => onFilterChange("sizes", values)}
-            initialValues={filter.sizes}
-            closeOnSelect={false}
-            isOpen={openDropdown === "sizes"}
-            setIsOpen={(open) => handleSetDropdownOpen("sizes", open)}
-          />
-        </div>
+        <FilterSection
+          title={t("sizes")}
+          options={filterOptions.sizes}
+          selectedValues={filter.sizes}
+          onSelect={(values) => onFilterChange("sizes", values)}
+          enableSearch={false}
+        />
       </div>
     </div>
   )

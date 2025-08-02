@@ -1,5 +1,3 @@
-"use client"
-
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
 import { useNavigate } from "react-router-dom"

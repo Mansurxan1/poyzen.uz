@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux"
@@ -25,6 +23,7 @@ export const useProductFilter = () => {
     sizes: [],
     priceMin: 0,
     priceMax: Number.POSITIVE_INFINITY,
+    bestDeals: false,
   })
 
   const [priceInput, setPriceInput] = useState<PriceInputState>({ min: "", max: "" })
@@ -39,6 +38,9 @@ export const useProductFilter = () => {
           (key === "priceMin" && value > 0 ? 1 : 0) +
           (key === "priceMax" && value < Number.POSITIVE_INFINITY ? 1 : 0)
         )
+      }
+      if (key === "bestDeals") {
+        return total + (value ? 1 : 0)
       }
       if (Array.isArray(value)) {
         return total + value.length
@@ -112,37 +114,59 @@ export const useProductFilter = () => {
 
   // Filter products based on criteria
   const getFilteredProducts = useCallback((strict = true) => {
-    return allVariants
-      .filter((variant) => {
-        // Use the current currency for price filtering
-        const priceMatch = variant.sizes.some((s: ProductSize) => {
-          const price = s.discount[currency]
-          return price >= filter.priceMin && price <= filter.priceMax
-        })
-
-        if (strict) {
-          return (
-            (filter.categories.length === 0 || filter.categories.includes(variant.category!.toString())) &&
-            (filter.colors.length === 0 || filter.colors.includes(variant.color.toString())) &&
-            (filter.seasons.length === 0 || filter.seasons.includes(variant.season.toString())) &&
-            (filter.materials.length === 0 || filter.materials.includes(variant.materials.toString())) &&
-            (filter.brands.length === 0 || filter.brands.includes(variant.brand!)) &&
-            (filter.genders.length === 0 || filter.genders.includes(variant.gender)) &&
-            (filter.sizes.length === 0 ||
-              variant.sizes.some((s: ProductSize) => filter.sizes.includes(s.size.toString()))) &&
-            priceMatch
-          )
-        } else {
-          // Relaxed filtering for similar products
-          const categoryMatch =
-            filter.categories.length === 0 || filter.categories.includes(variant.category!.toString())
-          const brandMatch = filter.brands.length === 0 || filter.brands.includes(variant.brand!)
-          const genderMatch = filter.genders.length === 0 || filter.genders.includes(variant.gender)
-
-          return categoryMatch || brandMatch || genderMatch || priceMatch
-        }
+    const filtered = allVariants.filter((variant) => {
+      // Use the current currency for price filtering
+      const priceMatch = variant.sizes.some((s: ProductSize) => {
+        const price = s.discount[currency]
+        return price >= filter.priceMin && price <= filter.priceMax
       })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+      if (strict) {
+        const bestDealsMatch = !filter.bestDeals || variant.sizes.some((s: ProductSize) => 
+          s.discount[currency] < s.price[currency]
+        )
+        
+        return (
+          (filter.categories.length === 0 || filter.categories.includes(variant.category!.toString())) &&
+          (filter.colors.length === 0 || filter.colors.includes(variant.color.toString())) &&
+          (filter.seasons.length === 0 || filter.seasons.includes(variant.season.toString())) &&
+          (filter.materials.length === 0 || filter.materials.includes(variant.materials.toString())) &&
+          (filter.brands.length === 0 || filter.brands.includes(variant.brand!)) &&
+          (filter.genders.length === 0 || filter.genders.includes(variant.gender)) &&
+          (filter.sizes.length === 0 ||
+            variant.sizes.some((s: ProductSize) => filter.sizes.includes(s.size.toString()))) &&
+          priceMatch &&
+          bestDealsMatch
+        )
+      } else {
+        // Relaxed filtering for similar products
+        const categoryMatch =
+          filter.categories.length === 0 || filter.categories.includes(variant.category!.toString())
+        const brandMatch = filter.brands.length === 0 || filter.brands.includes(variant.brand!)
+        const genderMatch = filter.genders.length === 0 || filter.genders.includes(variant.gender)
+
+        return categoryMatch || brandMatch || genderMatch || priceMatch
+      }
+    })
+
+    // Sort products based on filters
+    if (filter.bestDeals) {
+      // Sort by discount percentage (highest to lowest)
+      return filtered.sort((a, b) => {
+        const aMaxDiscount = Math.max(...a.sizes.map(s => {
+          if (s.price[currency] === 0) return 0
+          return ((s.price[currency] - s.discount[currency]) / s.price[currency]) * 100
+        }))
+        const bMaxDiscount = Math.max(...b.sizes.map(s => {
+          if (s.price[currency] === 0) return 0
+          return ((s.price[currency] - s.discount[currency]) / s.price[currency]) * 100
+        }))
+        return bMaxDiscount - aMaxDiscount
+      })
+    } else {
+      // Sort by date (newest first) when no filters or other filters
+      return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    }
   }, [allVariants, filter, currency])
 
   const filteredProducts = useMemo(() => getFilteredProducts(true), [getFilteredProducts])
@@ -152,6 +176,14 @@ export const useProductFilter = () => {
   )
 
   const handleFilterChange = (key: keyof FilterState, values: string[]) => {
+    if (key === "bestDeals") {
+      setFilter((prev) => ({
+        ...prev,
+        [key]: values.length > 0,
+      }))
+      return
+    }
+    
     let newValues = values
     if (newValues.length > 1 && newValues.includes("0")) {
       newValues = newValues.filter((v) => v !== "0")
@@ -184,6 +216,7 @@ export const useProductFilter = () => {
       sizes: [],
       priceMin: 0,
       priceMax: Number.POSITIVE_INFINITY,
+      bestDeals: false,
     })
     setPriceInput({ min: "", max: "" })
   }

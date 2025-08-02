@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -48,7 +46,6 @@ const ProductAll: React.FC = () => {
     window.scrollTo(0, 0)
   }, [])
 
-  // Filtr o'zgarganda sahifani 1 ga qaytarish
   useEffect(() => {
     setCurrentPage(1)
   }, [filter])
@@ -59,12 +56,15 @@ const ProductAll: React.FC = () => {
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+      <div className="max-w-7xl mx-auto py-4">
+        <div className="flex flex-col px-4 lg:flex-row lg:items-center lg:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("all_products")}</h1>
             <p className="text-gray-600">
@@ -87,7 +87,7 @@ const ProductAll: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-          <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-120px)] lg:overflow-y-auto">
+          <div className="hidden lg:block lg:sticky lg:top-4 p-4 lg:self-start">
             <FilterSidebar
               filter={filter}
               priceInput={priceInput}
@@ -100,7 +100,7 @@ const ProductAll: React.FC = () => {
             />
           </div>
           {isFilterOpen && (
-            <div className="lg:hidden fixed inset-0 z-30 bg-black bg-opacity-50">
+            <div className="lg:hidden fixed inset-0 z-30 bg-black/50 bg-opacity-50">
               <div className="absolute inset-0 w-full h-full bg-white shadow-2xl overflow-y-auto flex flex-col">
                 <div className="p-4 border-b border-gray-200 flex-shrink-0">
                   <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ const ProductAll: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="p-4 flex-grow overflow-y-auto">
+                <div className="p-4 flex-grow overflow-y-auto z-[999]">
                   <FilterSidebar
                     filter={filter}
                     priceInput={priceInput}
