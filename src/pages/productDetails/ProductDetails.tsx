@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState, useMemo, useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
@@ -11,7 +9,7 @@ import { Heart, Plus, Minus, ShoppingCart, Check, Star, ChevronRight, Bell, Mail
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import  Button from "@/components/ui/button"
+import Button from "@/components/ui/button"
 import Card from "@/components/ui/card"
 import Badge from "@/components/ui/badge"
 import Separator from "@/components/ui/separator"
@@ -25,7 +23,6 @@ import type {
 import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
 import type { Swiper as SwiperType } from "swiper"
-
 // @ts-expect-error - Swiper CSS module not found in types
 import "swiper/css"
 // @ts-expect-error - Swiper CSS module not found in types
@@ -249,7 +246,6 @@ const ProductDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-gray-600">
@@ -275,7 +271,6 @@ const ProductDetails: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Image Gallery */}
           <div className="space-y-4">
             <Card className="overflow-hidden">
               <div className="relative">
@@ -297,7 +292,6 @@ const ProductDetails: React.FC = () => {
                   ))}
                 </Swiper>
 
-                {/* Like Button */}
                 <Button
                   variant="secondary"
                   size="icon"
@@ -309,14 +303,14 @@ const ProductDetails: React.FC = () => {
                   />
                 </Button>
 
-                {/* Discount Badge */}
                 {discountPercentage > 0 && (
-                  <Badge className="absolute top-4 left-4 bg-red-500 text-white">-{discountPercentage}%</Badge>
+                  <Badge className="absolute z-20 top-4 left-4 bg-red-500 text-white font-bold text-lg py-2 px-4 rounded-lg shadow-md">
+                    -{discountPercentage}%
+                  </Badge>
                 )}
               </div>
             </Card>
 
-            {/* Thumbnails */}
             <div className="px-2">
               <Swiper
                 onSwiper={setThumbsSwiper}
@@ -346,13 +340,11 @@ const ProductDetails: React.FC = () => {
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
               <p className="text-lg text-gray-600 mb-4">{currentProductVariant.brand}</p>
 
-              {/* Rating */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -369,7 +361,6 @@ const ProductDetails: React.FC = () => {
                 <span className="text-sm text-gray-600">({currentProductVariant.rating}/5)</span>
               </div>
 
-              {/* Price */}
               <div className="flex items-center gap-3 mb-6">
                 {discountPercentage > 0 ? (
                   <>
@@ -387,7 +378,6 @@ const ProductDetails: React.FC = () => {
                 )}
               </div>
 
-              {/* Advance Payment */}
               {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
                 <Card className="p-4 bg-blue-50 border-blue-200 mb-6">
                   <p className="text-blue-800 font-medium">
@@ -400,7 +390,6 @@ const ProductDetails: React.FC = () => {
               )}
             </div>
 
-            {/* Product Details */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Mahsulot ma'lumotlari</h3>
               <div className="space-y-3">
@@ -427,7 +416,6 @@ const ProductDetails: React.FC = () => {
               </div>
             </Card>
 
-            {/* Color Selection */}
             <div>
               <h3 className="text-lg font-semibold mb-3">Rang</h3>
               <div className="flex gap-3">
@@ -451,7 +439,6 @@ const ProductDetails: React.FC = () => {
               </div>
             </div>
 
-            {/* Size Selection */}
             <div>
               <h3 className="text-lg font-semibold mb-3">O'lcham</h3>
               <div className="grid grid-cols-4 gap-2">
@@ -473,9 +460,7 @@ const ProductDetails: React.FC = () => {
               </div>
             </div>
 
-            {/* Quantity and Actions */}
             <div className="space-y-4">
-              {/* Quantity Selector */}
               <div className="flex items-center gap-4">
                 <span className="text-lg font-medium">Miqdor:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
@@ -495,7 +480,6 @@ const ProductDetails: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button
                   onClick={cartItem && cartItem.quantity > 0 ? () => navigate(`/${language}/cart`) : handleAddToCart}
@@ -521,14 +505,12 @@ const ProductDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Description */}
         <Card className="mt-8 p-6">
           <h3 className="text-xl font-semibold mb-4">Mahsulot haqida</h3>
           <p className="text-gray-700 leading-relaxed text-lg">{getLocalizedName(currentProductVariant.description)}</p>
         </Card>
       </div>
 
-      {/* Purchase Confirmation Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="max-w-md w-full p-6">

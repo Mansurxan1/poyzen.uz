@@ -9,7 +9,6 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card: React.FC<CardProps> = ({
   className = "",
   variant = "default",
-  padding = "default",
   children,
   ...props
 }) => {
@@ -22,15 +21,8 @@ const Card: React.FC<CardProps> = ({
     ghost: "bg-transparent",
   }
 
-  const paddings = {
-    none: "",
-    sm: "p-3",
-    default: "p-4",
-    lg: "p-6",
-  }
-
   return (
-    <div className={`${baseClasses} ${variants[variant]} ${paddings[padding]} ${className}`} {...props}>
+    <div className={`${baseClasses} ${variants[variant]} ${className}`} {...props}>
       {children}
     </div>
   )
