@@ -44,7 +44,7 @@ const App = () => {
           <Route path="/:lang/likes" element={<Likes />} />
           <Route path="/:lang/search" element={<Search />} />
           <Route path="/:lang/:brand/:nameUrl/:id" element={<ProductDetails />} />
-          <Route path="/:lang/brand" element={<Brand />} />
+          <Route path="/:lang/brands" element={<Brand />} />
           <Route path="/:lang/brand/:brandId" element={<BrandPage />} />
           <Route path="/:lang/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to={`/${currentLang}`} replace />} />

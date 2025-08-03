@@ -74,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ variant }) => {
       </div>
 
       <div className="p-2">
-        <h3 className="font-semibold line-clamp-2 text-ellipsis overflow-hidden">
+        <h3 className="font-semibold line-clamp-2 h-[48px] text-ellipsis overflow-hidden">
           {`${variant.brand} - ${variant.productName}`}
         </h3>
         <div className="flex flex-col text-sm text-gray-600">

@@ -1,5 +1,4 @@
 import type React from "react"
-
 import { useSelector, useDispatch } from "react-redux" // Import useDispatch
 import { useTranslation } from "react-i18next"
 import type { RootState, AppDispatch } from "@/redux" // Import AppDispatch
@@ -11,11 +10,11 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination } from "swiper/modules"
 import { useCurrency } from "@/hooks/useCurrency"
 import { addLike, removeLike } from "@/features/likesSlice" // Import Redux like actions
-import type { ProductVariant, Product } from "@/types" 
+import type { ProductVariant, Product } from "@/types"
 
 const Last24HoursProducts = () => {
   const { t } = useTranslation()
-  const dispatch: AppDispatch = useDispatch() 
+  const dispatch: AppDispatch = useDispatch()
   const products = useSelector((state: RootState) => state.products.data)
   const { currency, formatPrice } = useCurrency()
   const lang = useSelector((state: RootState) => state.language.language)
@@ -41,28 +40,24 @@ const Last24HoursProducts = () => {
     }
   }
 
-  const last24HourVariants = useMemo(() => {
-    const now = new Date()
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-
+  const recentVariants = useMemo(() => {
+    // Collect all variants with additional product metadata
     const allVariants: (ProductVariant & { brand: string; productName: string; product: Product })[] = []
 
     Object.values(products).forEach((brandProducts) => {
       brandProducts.forEach((product) => {
         product.variants.forEach((variant) => {
-          const createdDate = new Date(variant.createdAt)
-          if (createdDate > oneDayAgo) {
-            allVariants.push({
-              ...variant,
-              brand: product.brand,
-              productName: product.name,
-              product: product,
-            })
-          }
+          allVariants.push({
+            ...variant,
+            brand: product.brand,
+            productName: product.name,
+            product: product,
+          })
         })
       })
     })
 
+    // Group variants by product name
     const groupedByName: { [name: string]: (typeof allVariants)[0][] } = {}
     allVariants.forEach((variant) => {
       if (!groupedByName[variant.productName]) {
@@ -71,29 +66,44 @@ const Last24HoursProducts = () => {
       groupedByName[variant.productName].push(variant)
     })
 
+    // Select the most recent variant for each product name and collect all images and colors
     const filteredVariants = Object.values(groupedByName).map((variants) => {
-      return variants.sort((a, b) => {
-        const dateComparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        if (dateComparison !== 0) return dateComparison
-        return (a.sizes[0]?.discount?.[currency] || 0) - (b.sizes[0]?.discount?.[currency] || 0)
-      })[0]
+      // Sort variants by createdAt to get the most recent one
+      const sortedVariants = variants.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      const mostRecentVariant = sortedVariants[0]
+
+      // Collect all unique images from variants with the same product name, prioritizing the most recent variant's images
+      const allImages = sortedVariants
+        .flatMap((v) => v.images)
+        .filter((img, index, self) => self.indexOf(img) === index)
+
+      // Collect all unique color IDs
+      const uniqueColorIds = Array.from(new Set(sortedVariants.map((v) => v.color)))
+
+      // Find the lowest discount price among all sizes of all variants with the same product name
+      const allSizes = sortedVariants.flatMap((v) => v.sizes)
+      const lowestDiscountSize = allSizes
+        .filter((size) => size.discount?.[currency])
+        .sort((a, b) => a.discount[currency] - b.discount[currency])[0] || sortedVariants[0].sizes[0]
+
+      return {
+        ...mostRecentVariant,
+        images: [...mostRecentVariant.images, ...allImages.filter((img) => !mostRecentVariant.images.includes(img))], // Most recent images first
+        colorIds: uniqueColorIds,
+        sizes: [lowestDiscountSize], // Use the size with the lowest discount price
+      }
     })
 
-    const variantsWithAllColors = filteredVariants.map((variant) => {
-      const sameNameVariants = allVariants.filter((v) => v.productName === variant.productName)
-      const uniqueColorIds = Array.from(new Set(sameNameVariants.map((v) => v.color)))
-      return { ...variant, colorIds: uniqueColorIds }
-    })
-
-    return variantsWithAllColors
+    // Sort by createdAt to get the 10 most recent products
+    return filteredVariants
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10)
   }, [products, currency])
 
-  if (!last24HourVariants.length) {
+  if (!recentVariants.length) {
     return (
       <div className="p-4 text-center text-gray-500">
-        {t("new_arrivals")} ({t("no_new_products_24h")})
+        {t("new_arrivals")} ({t("no_new_products")})
       </div>
     )
   }
@@ -101,10 +111,10 @@ const Last24HoursProducts = () => {
   return (
     <section className="w-full sm:px-4 py-8">
       <h2 className="text-xl font-bold mb-4 text-center">
-        {t("new_arrivals")} ({t("last_24_hours")})
+        {t("new_arrivals")} ({t("latest_products")})
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr">
-        {last24HourVariants.map((item) => {
+        {recentVariants.map((item) => {
           const isItemLiked = likedProducts.some((likedItem) => likedItem.id === item.id)
           return (
             <Link

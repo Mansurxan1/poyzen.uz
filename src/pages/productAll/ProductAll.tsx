@@ -15,14 +15,15 @@ import FilterSidebar from "./components/FilterSidebar"
 import ProductGrid from "./components/ProductGrid"
 import Button from "@/components/ui/button"
 
-const PRODUCTS_PER_PAGE = 25 // Har sahifada ko'rsatiladigan mahsulotlar soni
+const PRODUCTS_PER_PAGE = 25
 
 const ProductAll: React.FC = () => {
   const { t } = useTranslation()
   const dispatch: AppDispatch = useDispatch()
   const language = useSelector((state: RootState) => state.language.language)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1) // Paginatsiya uchun joriy sahifa
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState<"price-asc" | "price-desc" | "date-desc">("date-desc")
 
   const {
     filter,
@@ -35,6 +36,22 @@ const ProductAll: React.FC = () => {
     handlePriceChange,
     clearAllFilters,
   } = useProductFilter()
+
+  // Sort products based on sortOrder
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortOrder === "price-asc") {
+      const priceA = a.sizes[0].discount.usd || a.sizes[0].price.usd
+      const priceB = b.sizes[0].discount.usd || b.sizes[0].price.usd
+      return priceA - priceB
+    } else if (sortOrder === "price-desc") {
+      const priceA = a.sizes[0].discount.usd || a.sizes[0].price.usd
+      const priceB = b.sizes[0].discount.usd || b.sizes[0].price.usd
+      return priceB - priceA
+    } else {
+      // Default: sort by date (newest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+  })
 
   useEffect(() => {
     const savedCurrency = localStorage.getItem("currency") || "usd"
@@ -52,17 +69,20 @@ const ProductAll: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [filter])
+  }, [filter, sortOrder])
 
-  // Paginatsiya logikasi
   const indexOfLastProduct = currentPage * PRODUCTS_PER_PAGE
   const indexOfFirstProduct = indexOfLastProduct - PRODUCTS_PER_PAGE
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
-  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+  const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE)
 
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSortChange = (sort: "price-asc" | "price-desc" | "date-desc") => {
+    setSortOrder(sort)
   }
 
   return (
@@ -72,21 +92,22 @@ const ProductAll: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("all_products")}</h1>
             <p className="text-gray-600">
-              {t("total_products")}: {filteredProducts.length}
+              {t("total_products")}: {sortedProducts.length}
             </p>
           </div>
 
           <div className="flex items-center gap-4 mt-4 lg:mt-0">
-            <button
+            <Button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="lg:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200"
+              className="lg:hidden flex items-center gap-2"
+              variant="outline"
             >
               <AiOutlineFilter className="w-5 h-5" />
               {t("filters")}
               {activeFilters > 0 && (
                 <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">{activeFilters}</span>
               )}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -100,7 +121,9 @@ const ProductAll: React.FC = () => {
               onFilterChange={handleFilterChange}
               onPriceChange={handlePriceChange}
               onClearAll={clearAllFilters}
-              currentProductCount={filteredProducts.length}
+              currentProductCount={sortedProducts.length}
+              onSortChange={handleSortChange}
+              sortOrder={sortOrder}
             />
           </div>
           {isFilterOpen && (
@@ -109,9 +132,14 @@ const ProductAll: React.FC = () => {
                 <div className="p-4 border-b border-gray-200 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{t("filters")}</h3>
-                    <button onClick={() => setIsFilterOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                    <Button
+                      onClick={() => setIsFilterOpen(false)}
+                      variant="ghost"
+                      size="icon"
+                      className="hover:bg-gray-100"
+                    >
                       <AiOutlineClose className="w-5 h-5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <div className="p-4 flex-grow overflow-y-auto z-[999]">
@@ -123,15 +151,19 @@ const ProductAll: React.FC = () => {
                     onFilterChange={handleFilterChange}
                     onPriceChange={handlePriceChange}
                     onClearAll={clearAllFilters}
-                    currentProductCount={filteredProducts.length}
+                    currentProductCount={sortedProducts.length}
+                    onSortChange={handleSortChange}
+                    sortOrder={sortOrder}
                   />
                 </div>
                 <div className="p-4 border-t border-gray-200 flex-shrink-0">
                   <Button
                     onClick={() => setIsFilterOpen(false)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
+                    className="w-full"
+                    variant="default"
+                    size="lg"
                   >
-                    {t("show_products")} ({filteredProducts.length})
+                    {t("show_products")} ({sortedProducts.length})
                   </Button>
                 </div>
               </div>
@@ -181,14 +213,17 @@ const ProductAll: React.FC = () => {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button
                       onClick={clearAllFilters}
-                      className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold"
+                      className="px-8 py-3"
+                      variant="default"
+                      size="lg"
                     >
                       {t("clear_filters")}
                     </Button>
                     <Link to={`/${language}/search?q=`}>
                       <Button
                         variant="outline"
-                        className="border-blue-500 text-blue-500 hover:bg-blue-50 px-8 py-3 rounded-lg transition-colors text-lg font-semibold"
+                        className="px-8 py-3"
+                        size="lg"
                       >
                         🔍 {t("search_products")}
                       </Button>

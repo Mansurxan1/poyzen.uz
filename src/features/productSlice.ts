@@ -156,7 +156,7 @@ const initialState: ProductState = {
             ],
             inStock: true,
             inAdvancePayment: true,
-            createdAt: "2025-08-02T15:00:00Z",
+            createdAt: "2025-08-01T15:00:00Z",
           },
         ],
         relatedBrands: ["Jordan", "Adidas"],

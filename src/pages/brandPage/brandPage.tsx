@@ -47,7 +47,6 @@ const BrandPage = () => {
 
   const brandKey = brandId.charAt(0).toUpperCase() + brandId.slice(1).toLowerCase()
 
-  // Pagination logic
   const indexOfLastProduct = currentPage * PRODUCTS_PER_PAGE
   const indexOfFirstProduct = indexOfLastProduct - PRODUCTS_PER_PAGE
   const currentProducts = brandProducts.slice(indexOfFirstProduct, indexOfLastProduct)
@@ -71,12 +70,26 @@ const BrandPage = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr">
               {currentProducts.map((variant) => (
                 <ProductCard key={variant.id} variant={variant} />
               ))}
             </div>
             
+            <div className="mt-12 text-center">
+              <p className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
+                Siz izlagan model topilmadi?
+              </p>
+              <a
+                href="https://t.me/poyzenUz_Admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mx-4 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300"
+              >
+                Adminga murojaat qiling, siz izlagan tovar albatta topiladi!
+              </a>
+            </div>
+
             {totalPages > 1 && (
               <div className="flex justify-center items-center gap-2 mt-8">
                 <Button

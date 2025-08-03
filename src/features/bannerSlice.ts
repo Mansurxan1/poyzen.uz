@@ -17,7 +17,7 @@ const initialState: BannerItem[] = [
         uz: "https://cdn.pixabay.com/photo/2020/04/09/08/38/nike-5020363_1280.jpg",
         ru: "https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg",
     },
-    url: "/contact"
+    url: "/products"
   },
   {
     id: 'adidas-yeezy-350',
@@ -25,7 +25,7 @@ const initialState: BannerItem[] = [
         uz: "https://brand.assets.adidas.com/image/upload/f_auto,q_auto,w_800/shoes_women_tcc_d_234be42564.jpg",
         ru: "https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg",
     },
-    url: "/contact"
+    url: "/brand"
   },
   {
     id: 'adidas-yeezy-500',
@@ -33,7 +33,7 @@ const initialState: BannerItem[] = [
         uz: "https://cdn.pixabay.com/photo/2023/05/03/22/43/tennis-7968714_1280.png",
         ru: "https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg",
     },
-    url: "contact"
+    url: ""
   },
 ]
 

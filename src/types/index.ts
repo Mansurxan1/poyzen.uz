@@ -98,7 +98,6 @@ export interface DropdownOption {
   color?: string
 }
 
-// Component Props Types
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
@@ -123,17 +122,6 @@ export interface DropdownProps {
   onSelect?: (value: string) => void
   initialValue?: string
   className?: string
-}
-
-export interface MultiSelectDropdownProps {
-  options: DropdownOption[]
-  placeholder?: string
-  onSelect?: (values: string[]) => void
-  initialValues?: string[]
-  enableSearch?: boolean
-  closeOnSelect?: boolean
-  isOpen?: boolean
-  setIsOpen?: (open: boolean) => void
 }
 
 export interface SearchBarProps {
