@@ -12,12 +12,11 @@ import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
 import Button from "@/components/ui/button"
-import type { Color } from "@/types"
-import type { ProductSize as ProductSizeType, ProductVariant as ProductVariantType } from "@/types"
+import type { Color, Material, Season, ProductSize as ProductSizeType, ProductVariant as ProductVariantType } from "@/types"
 import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
-import type { Material, Season } from "@/types"
 import type { Swiper as SwiperType } from "swiper"
+import { AiOutlineBell, AiOutlineCheckCircle, AiOutlinePushpin, AiOutlineMail } from "react-icons/ai"
 // @ts-expect-error - Swiper CSS module not found in types
 import "swiper/css"
 // @ts-expect-error - Swiper CSS module not found in types
@@ -40,6 +39,7 @@ const ProductDetails: React.FC = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [selectedSize, setSelectedSize] = useState<number | null>(null)
   const [quantity, setQuantity] = useState(1)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -171,6 +171,35 @@ const ProductDetails: React.FC = () => {
     }
   }
 
+  const handleBuyNow = () => {
+    if (!selectedSizeDetails) {
+      dispatch(addToast({ message: t("select_size_error"), type: "warning" }))
+      return
+    }
+    if (quantity <= 0) {
+      dispatch(addToast({ message: t("select_quantity_error"), type: "warning" }))
+      return
+    }
+    setIsModalOpen(true)
+  }
+
+  const handleConfirmBuy = () => {
+    if (currentProductVariant && selectedSizeDetails) {
+      // Clear all cart items with the same product ID
+      cartItems.forEach((item) => {
+        if (item.id === currentProductVariant.id) {
+          dispatch(removeItemFromCart({ id: item.id, size: item.size }))
+        }
+      })
+      dispatch(addToast({ message: t("cart_cleared_for_product"), type: "info" }))
+      
+      // Redirect to Telegram bot with id, size, and quantity
+      const telegramUrl = `https://t.me/poyzenuzbot?start=${currentProductVariant.id}-${selectedSizeDetails.size}-${quantity}`
+      window.location.href = telegramUrl
+    }
+    setIsModalOpen(false)
+  }
+
   const handleToggleLike = (e: React.MouseEvent) => {
     if (!currentProductVariant || !currentProductVariant.product) return
     toggleLike(currentProductVariant.id, currentProductVariant, currentProductVariant.product, e)
@@ -234,8 +263,8 @@ const ProductDetails: React.FC = () => {
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-5">
-          <div className="w-full lg:w-1/2 flex flex-col">
-            <div className="relative w-full  mb-4">
+          <div className="w-full lg:w-1/2 flex flex-col items-center">
+            <div className="relative w-full mb-4">
               <Swiper
                 spaceBetween={10}
                 thumbs={{ swiper: thumbsSwiper }}
@@ -278,7 +307,7 @@ const ProductDetails: React.FC = () => {
                 {currentProductVariant.images.map((image, index) => (
                   <SwiperSlide
                     key={index}
-                    className="!w-20 !h-20 flex-shrink-0" // Fixed width for each thumbnail
+                    className="!w-20 !h-20 flex-shrink-0"
                   >
                     <img
                       src={image || "/placeholder.svg"}
@@ -386,7 +415,7 @@ const ProductDetails: React.FC = () => {
               )}
             </div>
 
-            {currentProductVariant.inAdvancePayment && (
+            {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
               <div className="mb-4 text-blue-700 font-medium">
                 <p>
                   {t("in_advance_payment_details")}{" "}
@@ -398,8 +427,8 @@ const ProductDetails: React.FC = () => {
             )}
 
             <div className="flex flex-col gap-4 mb-6">
-              {cartItem && cartItem.quantity > 0 ? (
-                <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
+                {cartItem && cartItem.quantity > 0 ? (
                   <div className="flex items-center border border-gray-300 rounded-lg">
                     <Button
                       variant="ghost"
@@ -414,26 +443,45 @@ const ProductDetails: React.FC = () => {
                       <FaPlus className="w-4 h-4" />
                     </Button>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <Button
-                    onClick={handleAddToCart}
-                    disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    <FaShoppingCart className="mr-3 w-5 h-5" /> {t("add_to_cart")}
-                  </Button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex items-center border border-gray-300 rounded-lg">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 0}
+                    >
+                      <FaMinus className="w-4 h-4" />
+                    </Button>
+                    <span className="px-4 text-lg font-medium">{quantity}</span>
+                    <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)}>
+                      <FaPlus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+                <Button
+                  onClick={cartItem && cartItem.quantity > 0 ? () => navigate(`/${language}/cart`) : handleAddToCart}
+                  disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <FaShoppingCart className="mr-3 w-5 h-5" /> {cartItem && cartItem.quantity > 0 ? t("go_to_cart") : t("add_to_cart")}
+                </Button>
+              </div>
+              <Button
+                onClick={handleBuyNow}
+                disabled={!selectedSizeDetails || !selectedSizeDetails.inStock || quantity <= 0}
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                {t("buy_now")}
+              </Button>
             </div>
           </div>
         </div>
+
         <div className="mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("description")}</h3>
           <p className="text-gray-700 leading-relaxed">{getLocalizedName(currentProductVariant.description)}</p>
         </div>
-
         <div className="mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("composition")}</h3>
           <p className="text-gray-700 leading-relaxed">{getMaterialName(currentProductVariant.materials)}</p>
@@ -444,6 +492,41 @@ const ProductDetails: React.FC = () => {
           <p className="text-gray-700 leading-relaxed">{currentProductVariant.rating}/5</p>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <AiOutlineBell className="text-yellow-500" /> Diqqat!
+            </h2>
+            <p className="mb-2 flex items-center gap-2">
+              <AiOutlineMail className="text-blue-500 w-12" /> Sizni hozir Telegram botga yo‘naltiramiz. Iltimos, bot ochilgach, "Start" tugmasini bosing. Bu tugma orqali sizning buyurtmangiz tasdiqlanadi <AiOutlineCheckCircle className="text-green-500" />
+            </p>
+            <p className="mb-2 font-semibold flex items-center gap-2">
+              <AiOutlinePushpin className="text-red-500" /> Muhim!
+            </p>
+            <p className="mb-4">Agar siz "Start" tugmasini bosmasangiz yoki uni o‘chirib qo‘ysangiz, admin siz bilan bog‘lana olmaydi.</p>
+            <p className="mb-4 flex items-center gap-2">
+              <AiOutlineMail className="text-blue-500 w-12" /> Start tugmasi bosilgach, iltimos, admin javobini kuting – tez orada siz bilan aloqaga chiqiladi.
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                variant="outline"
+                className="px-4 py-2 rounded-md"
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                onClick={handleConfirmBuy}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+              >
+                {t("confirm")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
