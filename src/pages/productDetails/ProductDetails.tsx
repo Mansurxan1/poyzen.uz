@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 import { useState, useMemo, useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
@@ -5,18 +7,25 @@ import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { FreeMode, Thumbs } from "swiper/modules"
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
-import { FaPlus, FaMinus, FaShoppingCart } from "react-icons/fa"
-import { FiCheck } from "react-icons/fi"
+import { Heart, Plus, Minus, ShoppingCart, Check, Star, ChevronRight, Bell, Mail, Pin, CheckCircle } from "lucide-react"
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import Button from "@/components/ui/button"
-import type { Color, Material, Season, ProductSize as ProductSizeType, ProductVariant as ProductVariantType } from "@/types"
+import  Button from "@/components/ui/button"
+import Card from "@/components/ui/card"
+import Badge from "@/components/ui/badge"
+import Separator from "@/components/ui/separator"
+import type {
+  Color,
+  Material,
+  Season,
+  ProductSize as ProductSizeType,
+  ProductVariant as ProductVariantType,
+} from "@/types"
 import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
 import type { Swiper as SwiperType } from "swiper"
-import { AiOutlineBell, AiOutlineCheckCircle, AiOutlinePushpin, AiOutlineMail } from "react-icons/ai"
+
 // @ts-expect-error - Swiper CSS module not found in types
 import "swiper/css"
 // @ts-expect-error - Swiper CSS module not found in types
@@ -31,6 +40,7 @@ const ProductDetails: React.FC = () => {
   const navigate = useNavigate()
   const { currency, formatPrice } = useCurrency()
   const { toggleLike, isLiked } = useProductLikes()
+
   const language = useSelector((state: RootState) => state.language.language)
   const productsData = useSelector((state: RootState) => state.products.data)
   const categoriesData = useSelector((state: RootState) => state.categories)
@@ -40,6 +50,7 @@ const ProductDetails: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -49,6 +60,7 @@ const ProductDetails: React.FC = () => {
     if (!brand || !nameUrl || !id) return null
     const brandProducts = productsData[brand]
     if (!brandProducts) return null
+
     for (const prod of brandProducts) {
       const variant = prod.variants.find((v) => v.id === id && v.nameUrl === nameUrl)
       if (variant) {
@@ -96,7 +108,6 @@ const ProductDetails: React.FC = () => {
   const displayPrice = selectedSizeDetails?.price[currency] || currentProductVariant?.sizes[0]?.price[currency] || 0
   const displayDiscount =
     selectedSizeDetails?.discount[currency] || currentProductVariant?.sizes[0]?.discount[currency] || 0
-
   const advancePaymentAmount = displayDiscount * 0.3
 
   const cartItem = useMemo(() => {
@@ -128,7 +139,6 @@ const ProductDetails: React.FC = () => {
     }
 
     const newQuantity = Math.max(0, quantity + amount)
-
     if (newQuantity === 0) {
       dispatch(removeItemFromCart({ id: currentProductVariant!.id, size: selectedSizeDetails.size }))
       dispatch(addToast({ message: t("product_removed_from_cart"), type: "info" }))
@@ -157,6 +167,7 @@ const ProductDetails: React.FC = () => {
       dispatch(addToast({ message: t("select_size_error"), type: "warning" }))
       return
     }
+
     if (currentProductVariant && selectedSizeDetails) {
       dispatch(
         addItemToCart({
@@ -185,15 +196,13 @@ const ProductDetails: React.FC = () => {
 
   const handleConfirmBuy = () => {
     if (currentProductVariant && selectedSizeDetails) {
-      // Clear all cart items with the same product ID
       cartItems.forEach((item) => {
         if (item.id === currentProductVariant.id) {
           dispatch(removeItemFromCart({ id: item.id, size: item.size }))
         }
       })
       dispatch(addToast({ message: t("cart_cleared_for_product"), type: "info" }))
-      
-      // Redirect to Telegram bot with id, size, and quantity
+
       const telegramUrl = `https://t.me/poyzenuzbot?start=${currentProductVariant.id}-${selectedSizeDetails.size}-${quantity}`
       window.location.href = telegramUrl
     }
@@ -226,138 +235,202 @@ const ProductDetails: React.FC = () => {
 
   if (!currentProductVariant) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
-        {t("no_products_found")}
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-8 text-center">
+          <h2 className="text-2xl font-semibold text-gray-600 mb-2">{t("no_products_found")}</h2>
+          <p className="text-gray-500">Mahsulot topilmadi</p>
+        </Card>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <nav className="text-sm text-gray-500 mb-6">
-          <ol className="list-none p-0 inline-flex">
-            <li className="flex items-center">
-              <Link to={`/${language}`} className="text-blue-600 hover:underline">
-                {t("home")}
-              </Link>
-              <span className="mx-2">/</span>
-            </li>
-            <li className="flex items-center">
-              <Link to={`/${language}/products`} className="text-blue-600 hover:underline">
-                {t("products")}
-              </Link>
-              <span className="mx-2">/</span>
-            </li>
-            <li className="flex items-center">
-              <Link
-                to={`/${language}/brand/${currentProductVariant.brand?.toLowerCase()}`}
-                className="text-blue-600 hover:underline"
-              >
-                {currentProductVariant.brand}
-              </Link>
-              <span className="mx-2">/</span>
-            </li>
-            <li className="text-gray-700 font-medium">{currentProductVariant.productName}</li>
-          </ol>
-        </nav>
+  const discountPercentage =
+    displayDiscount < displayPrice ? Math.round(((displayPrice - displayDiscount) / displayPrice) * 100) : 0
 
-        <div className="flex flex-col lg:flex-row gap-5">
-          <div className="w-full lg:w-1/2 flex flex-col items-center">
-            <div className="relative w-full mb-4">
-              <Swiper
-                spaceBetween={10}
-                thumbs={{ swiper: thumbsSwiper }}
-                modules={[FreeMode, Thumbs]}
-                className="mySwiper2 rounded-2xl"
-              >
-                {currentProductVariant.images.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <img
-                      src={image}
-                      alt={`${currentProductVariant.productName} ${index + 1}`}
-                      className="w-full h-auto object-cover max-h-[450px]"
-                    />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-              <button
-                onClick={(e) => handleToggleLike(e)}
-                className={`absolute top-4 right-4 rounded-full p-2 shadow-md z-10 ${
-                  isLiked(currentProductVariant.id) ? "bg-white border-none" : ""
-                }`}
-              >
-                {isLiked(currentProductVariant.id) ? (
-                  <AiFillHeart className="w-6 h-6 text-teal-400" aria-label="unlike" />
-                ) : (
-                  <AiOutlineHeart className="w-6 h-6" aria-label="like" />
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Breadcrumb */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <nav className="flex items-center space-x-2 text-sm text-gray-600">
+            <Link to={`/${language}`} className="hover:text-blue-600 transition-colors">
+              {t("home")}
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link to={`/${language}/products`} className="hover:text-blue-600 transition-colors">
+              {t("products")}
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link
+              to={`/${language}/brand/${currentProductVariant.brand?.toLowerCase()}`}
+              className="hover:text-blue-600 transition-colors"
+            >
+              {currentProductVariant.brand}
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-900 font-medium">{currentProductVariant.productName}</span>
+          </nav>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Image Gallery */}
+          <div className="space-y-4">
+            <Card className="overflow-hidden">
+              <div className="relative">
+                <Swiper
+                  spaceBetween={10}
+                  thumbs={{ swiper: thumbsSwiper }}
+                  modules={[FreeMode, Thumbs]}
+                  onSlideChange={(swiper) => setActiveImageIndex(swiper.activeIndex)}
+                  className="aspect-square"
+                >
+                  {currentProductVariant.images.map((image, index) => (
+                    <SwiperSlide key={index}>
+                      <img
+                        src={image || "/placeholder.svg"}
+                        alt={`${currentProductVariant.productName} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                {/* Like Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={handleToggleLike}
+                  className="absolute top-4 right-4 rounded-full shadow-lg z-10"
+                >
+                  <Heart
+                    className={`w-5 h-5 ${isLiked(currentProductVariant.id) ? "fill-red-500 text-red-500" : ""}`}
+                  />
+                </Button>
+
+                {/* Discount Badge */}
+                {discountPercentage > 0 && (
+                  <Badge className="absolute top-4 left-4 bg-red-500 text-white">-{discountPercentage}%</Badge>
                 )}
-              </button>
-            </div>
-            <div className="w-full">
+              </div>
+            </Card>
+
+            {/* Thumbnails */}
+            <div className="px-2">
               <Swiper
                 onSwiper={setThumbsSwiper}
-                spaceBetween={10}
+                spaceBetween={8}
                 slidesPerView="auto"
                 freeMode={true}
                 watchSlidesProgress={true}
                 modules={[FreeMode, Thumbs]}
-                className="mySwiper h-24 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100"
+                className="thumbnail-swiper"
               >
                 {currentProductVariant.images.map((image, index) => (
-                  <SwiperSlide
-                    key={index}
-                    className="!w-20 !h-20 flex-shrink-0"
-                  >
-                    <img
-                      src={image || "/placeholder.svg"}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover rounded-md cursor-pointer border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200"
-                    />
+                  <SwiperSlide key={index} className="!w-20 !h-20">
+                    <div
+                      className={`w-full h-full rounded-lg overflow-hidden border-2 cursor-pointer transition-all ${
+                        activeImageIndex === index ? "border-blue-500" : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <img
+                        src={image || "/placeholder.svg"}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
           </div>
 
-          <div className="w-full lg:w-1/2">
-            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
-            <p className="text-gray-600 mb-4">{currentProductVariant.brand}</p>
+          {/* Product Info */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
+              <p className="text-lg text-gray-600 mb-4">{currentProductVariant.brand}</p>
 
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("article")}:</span>
-              <span className="text-lg text-gray-600">{currentProductVariant.id}</span>
-            </div>
+              {/* Rating */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < Math.floor(currentProductVariant.rating)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-600">({currentProductVariant.rating}/5)</span>
+              </div>
 
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("gender")}:</span>
-              <span className="text-lg text-gray-600">{t(currentProductVariant.gender.toLowerCase())}</span>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">{t("availableSizes")}</h3>
-              <div className="flex flex-wrap gap-2">
-                {availableSizes.length > 0 ? (
-                  availableSizes.map((size: ProductSizeType) => (
-                    <Button
-                      key={size.size}
-                      variant={selectedSize === size.size ? "default" : "outline"}
-                      onClick={() => handleSizeSelect(size.size)}
-                      disabled={!size.inStock}
-                      className={`px-4 py-2 rounded-md ${!size.inStock ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      {size.size}
-                    </Button>
-                  ))
+              {/* Price */}
+              <div className="flex items-center gap-3 mb-6">
+                {discountPercentage > 0 ? (
+                  <>
+                    <span className="text-3xl font-bold text-green-600">
+                      {formatPrice(displayDiscount)} {currency.toUpperCase()}
+                    </span>
+                    <span className="text-xl text-gray-400 line-through">
+                      {formatPrice(displayPrice)} {currency.toUpperCase()}
+                    </span>
+                  </>
                 ) : (
-                  <p className="text-gray-500">{t("no_available_sizes")}</p>
+                  <span className="text-3xl font-bold text-gray-900">
+                    {formatPrice(displayPrice)} {currency.toUpperCase()}
+                  </span>
                 )}
               </div>
+
+              {/* Advance Payment */}
+              {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
+                <Card className="p-4 bg-blue-50 border-blue-200 mb-6">
+                  <p className="text-blue-800 font-medium">
+                    {t("in_advance_payment_details")}{" "}
+                    <span className="font-bold">
+                      {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
+                    </span>
+                  </p>
+                </Card>
+              )}
             </div>
 
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("color")}:</span>
-              <div className="flex gap-2">
+            {/* Product Details */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Mahsulot ma'lumotlari</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Artikul:</span>
+                  <span className="font-medium">{currentProductVariant.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Jins:</span>
+                  <span className="font-medium">{t(currentProductVariant.gender.toLowerCase())}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Material:</span>
+                  <span className="font-medium">{getMaterialName(currentProductVariant.materials)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mavsum:</span>
+                  <span className="font-medium">{getSeasonName(currentProductVariant.season)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Yil:</span>
+                  <span className="font-medium">{currentProductVariant.year}</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Color Selection */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Rang</h3>
+              <div className="flex gap-3">
                 {uniqueColorVariants.map((variant) => {
                   const color = categoriesData.colors.find((c: Color) => c.id === variant.color)
                   const isSelected = variant.id === currentProductVariant.id
@@ -365,166 +438,141 @@ const ProductDetails: React.FC = () => {
                     <button
                       key={variant.id}
                       onClick={() => navigate(`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`)}
-                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        isSelected ? "border-blue-500 ring-2 ring-blue-300" : "border-gray-300 hover:border-gray-400"
+                      className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all ${
+                        isSelected ? "border-blue-500 scale-110" : "border-gray-300 hover:border-gray-400"
                       }`}
                       style={{ backgroundColor: color?.color }}
                       title={getColorName(variant.color)}
-                      aria-label={`Select color ${getColorName(variant.color)}`}
                     >
-                      {isSelected && <FiCheck className="w-4 h-4 text-white drop-shadow-sm" />}
+                      {isSelected && <Check className="w-5 h-5 text-white drop-shadow-lg" />}
                     </button>
                   )
                 })}
               </div>
             </div>
 
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("materials")}:</span>
-              <span className="text-lg text-gray-600">{getMaterialName(currentProductVariant.materials)}</span>
-            </div>
-
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("season")}:</span>
-              <span className="text-lg text-gray-600">{getSeasonName(currentProductVariant.season)}</span>
-            </div>
-
-            <div className="flex items-center mb-6">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("year")}:</span>
-              <span className="text-lg text-gray-600">{currentProductVariant.year}</span>
-            </div>
-
-            <div className="flex items-center mb-6">
-              <span className="text-xl font-semibold text-gray-800 mr-2">{t("price")}:</span>
-              {displayDiscount < displayPrice ? (
-                <>
-                  <span className="text-sm sm:text-xl mt-1 font-bold text-green-600 mr-2">
-                    {formatPrice(displayDiscount)} {currency.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-red-400 mt-1 line-through">
-                    {formatPrice(displayPrice)} {currency.toUpperCase()}
-                  </span>
-                  <span className="ml-2 bg-red-500 text-white p-1 rounded text-sm font-semibold">
-                    -{Math.round(((displayPrice - displayDiscount) / displayPrice) * 100)}%
-                  </span>
-                </>
-              ) : (
-                <span className="text-2xl font-bold text-gray-900">
-                  {formatPrice(displayPrice)} {currency.toUpperCase()}
-                </span>
-              )}
-            </div>
-
-            {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
-              <div className="mb-4 text-blue-700 font-medium">
-                <p>
-                  {t("in_advance_payment_details")}{" "}
-                  <span className="font-bold">
-                    {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
-                  </span>
-                </p>
-              </div>
-            )}
-
-            <div className="flex flex-col gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                {cartItem && cartItem.quantity > 0 ? (
-                  <div className="flex items-center border border-gray-300 rounded-lg">
+            {/* Size Selection */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">O'lcham</h3>
+              <div className="grid grid-cols-4 gap-2">
+                {availableSizes.length > 0 ? (
+                  availableSizes.map((size: ProductSizeType) => (
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleQuantityChange(-1)}
-                      disabled={quantity <= 0}
+                      key={size.size}
+                      variant={selectedSize === size.size ? "default" : "outline"}
+                      onClick={() => handleSizeSelect(size.size)}
+                      disabled={!size.inStock}
+                      className="h-12 text-lg font-semibold"
                     >
-                      <FaMinus className="w-4 h-4" />
+                      {size.size}
                     </Button>
-                    <span className="px-4 text-lg font-medium">{quantity}</span>
-                    <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)}>
-                      <FaPlus className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  ))
                 ) : (
-                  <div className="flex items-center border border-gray-300 rounded-lg">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleQuantityChange(-1)}
-                      disabled={quantity <= 0}
-                    >
-                      <FaMinus className="w-4 h-4" />
-                    </Button>
-                    <span className="px-4 text-lg font-medium">{quantity}</span>
-                    <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)}>
-                      <FaPlus className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  <p className="text-gray-500 col-span-4">Mavjud o'lchamlar yo'q</p>
                 )}
+              </div>
+            </div>
+
+            {/* Quantity and Actions */}
+            <div className="space-y-4">
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-4">
+                <span className="text-lg font-medium">Miqdor:</span>
+                <div className="flex items-center border border-gray-300 rounded-lg">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleQuantityChange(-1)}
+                    disabled={quantity <= 1}
+                    className="h-12 w-12"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <span className="px-6 text-lg font-semibold min-w-[60px] text-center">{quantity}</span>
+                  <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)} className="h-12 w-12">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button
                   onClick={cartItem && cartItem.quantity > 0 ? () => navigate(`/${language}/cart`) : handleAddToCart}
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  variant="outline"
+                  size="lg"
+                  className="h-14 text-lg font-semibold"
                 >
-                  <FaShoppingCart className="mr-3 w-5 h-5" /> {cartItem && cartItem.quantity > 0 ? t("go_to_cart") : t("add_to_cart")}
+                  <ShoppingCart className="mr-2 w-5 h-5" />
+                  {cartItem && cartItem.quantity > 0 ? "Savatga o'tish" : "Savatga qo'shish"}
+                </Button>
+
+                <Button
+                  onClick={handleBuyNow}
+                  disabled={!selectedSizeDetails || !selectedSizeDetails.inStock || quantity <= 0}
+                  size="lg"
+                  className="h-14 text-lg font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                >
+                  Hozir sotib olish
                 </Button>
               </div>
-              <Button
-                onClick={handleBuyNow}
-                disabled={!selectedSizeDetails || !selectedSizeDetails.inStock || quantity <= 0}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                {t("buy_now")}
-              </Button>
             </div>
           </div>
         </div>
 
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("description")}</h3>
-          <p className="text-gray-700 leading-relaxed">{getLocalizedName(currentProductVariant.description)}</p>
-        </div>
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("composition")}</h3>
-          <p className="text-gray-700 leading-relaxed">{getMaterialName(currentProductVariant.materials)}</p>
-        </div>
-
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("rating")}</h3>
-          <p className="text-gray-700 leading-relaxed">{currentProductVariant.rating}/5</p>
-        </div>
+        {/* Product Description */}
+        <Card className="mt-8 p-6">
+          <h3 className="text-xl font-semibold mb-4">Mahsulot haqida</h3>
+          <p className="text-gray-700 leading-relaxed text-lg">{getLocalizedName(currentProductVariant.description)}</p>
+        </Card>
       </div>
 
+      {/* Purchase Confirmation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <AiOutlineBell className="text-yellow-500" /> Diqqat!
-            </h2>
-            <p className="mb-2 flex items-center gap-2">
-              <AiOutlineMail className="text-blue-500 w-12" /> Sizni hozir Telegram botga yo‘naltiramiz. Iltimos, bot ochilgach, "Start" tugmasini bosing. Bu tugma orqali sizning buyurtmangiz tasdiqlanadi <AiOutlineCheckCircle className="text-green-500" />
-            </p>
-            <p className="mb-2 font-semibold flex items-center gap-2">
-              <AiOutlinePushpin className="text-red-500" /> Muhim!
-            </p>
-            <p className="mb-4">Agar siz "Start" tugmasini bosmasangiz yoki uni o‘chirib qo‘ysangiz, admin siz bilan bog‘lana olmaydi.</p>
-            <p className="mb-4 flex items-center gap-2">
-              <AiOutlineMail className="text-blue-500 w-12" /> Start tugmasi bosilgach, iltimos, admin javobini kuting – tez orada siz bilan aloqaga chiqiladi.
-            </p>
-            <div className="flex justify-end gap-4">
-              <Button
-                onClick={() => setIsModalOpen(false)}
-                variant="outline"
-                className="px-4 py-2 rounded-md"
-              >
-                {t("cancel")}
-              </Button>
-              <Button
-                onClick={handleConfirmBuy}
-                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-              >
-                {t("confirm")}
-              </Button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-md w-full p-6">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <Bell className="w-12 h-12 text-yellow-500" />
+              </div>
+
+              <h2 className="text-xl font-bold">Diqqat!</h2>
+
+              <div className="space-y-3 text-left">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm">
+                    Sizni hozir Telegram botga yo'naltiramiz. Iltimos, bot ochilgach, "Start" tugmasini bosing.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm">Bu tugma orqali sizning buyurtmangiz tasdiqlanadi.</p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Pin className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold">Muhim!</p>
+                    <p className="text-sm">Agar siz "Start" tugmasini bosmasangiz, admin siz bilan bog'lana olmaydi.</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex gap-3">
+                <Button onClick={() => setIsModalOpen(false)} variant="outline" className="flex-1">
+                  Bekor qilish
+                </Button>
+                <Button onClick={handleConfirmBuy} className="flex-1 bg-green-500 hover:bg-green-600">
+                  Tasdiqlash
+                </Button>
+              </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>
