@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Swiper, SwiperSlide } from "swiper/react"
-import { FreeMode, Navigation, Thumbs } from "swiper/modules"
+import { FreeMode, Thumbs } from "swiper/modules"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { FaPlus, FaMinus, FaShoppingCart } from "react-icons/fa"
 import { FiCheck } from "react-icons/fi"
@@ -18,6 +18,12 @@ import { useCurrency } from "@/hooks/useCurrency"
 import { useProductLikes } from "@/hooks/useProductLikes"
 import type { Material, Season } from "@/types"
 import type { Swiper as SwiperType } from "swiper"
+// @ts-expect-error - Swiper CSS module not found in types
+import "swiper/css"
+// @ts-expect-error - Swiper CSS module not found in types
+import "swiper/css/free-mode"
+// @ts-expect-error - Swiper CSS module not found in types
+import "swiper/css/thumbs"
 
 const ProductDetails: React.FC = () => {
   const { t } = useTranslation()
@@ -198,249 +204,244 @@ const ProductDetails: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 max-w-7xl mx-auto">
-      {/* Breadcrumbs */}
-      <nav className="text-sm text-gray-500 mb-6">
-        <ol className="list-none p-0 inline-flex">
-          <li className="flex items-center">
-            <Link to={`/${language}`} className="text-blue-600 hover:underline">
-              {t("home")}
-            </Link>
-            <span className="mx-2">/</span>
-          </li>
-          <li className="flex items-center">
-            <Link to={`/${language}/products`} className="text-blue-600 hover:underline">
-              {t("products")}
-            </Link>
-            <span className="mx-2">/</span>
-          </li>
-          <li className="flex items-center">
-            <Link
-              to={`/${language}/brand/${currentProductVariant.brand?.toLowerCase()}`}
-              className="text-blue-600 hover:underline"
-            >
-              {currentProductVariant.brand}
-            </Link>
-            <span className="mx-2">/</span>
-          </li>
-          <li className="text-gray-700 font-medium">{currentProductVariant.productName}</li>
-        </ol>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <nav className="text-sm text-gray-500 mb-6">
+          <ol className="list-none p-0 inline-flex">
+            <li className="flex items-center">
+              <Link to={`/${language}`} className="text-blue-600 hover:underline">
+                {t("home")}
+              </Link>
+              <span className="mx-2">/</span>
+            </li>
+            <li className="flex items-center">
+              <Link to={`/${language}/products`} className="text-blue-600 hover:underline">
+                {t("products")}
+              </Link>
+              <span className="mx-2">/</span>
+            </li>
+            <li className="flex items-center">
+              <Link
+                to={`/${language}/brand/${currentProductVariant.brand?.toLowerCase()}`}
+                className="text-blue-600 hover:underline"
+              >
+                {currentProductVariant.brand}
+              </Link>
+              <span className="mx-2">/</span>
+            </li>
+            <li className="text-gray-700 font-medium">{currentProductVariant.productName}</li>
+          </ol>
+        </nav>
 
-      <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-10 flex flex-col lg:flex-row gap-8">
-        {/* Product Images */}
-        <div className="w-full lg:w-1/2 flex flex-col items-center">
-          <div className="relative w-full max-w-lg mb-4">
-            <Swiper
-              spaceBetween={10}
-              thumbs={{ swiper: thumbsSwiper }}
-              modules={[FreeMode, Navigation, Thumbs]}
-              className="mySwiper2 rounded-lg shadow-md"
-            >
-              {currentProductVariant.images.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={image || "/placeholder.svg"}
-                    alt={`${currentProductVariant.productName} ${index + 1}`}
-                    className="w-full h-auto object-contain max-h-[450px]"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            <button
-              onClick={(e) => handleToggleLike(e)}
-              className={`absolute top-4 right-4 rounded-full p-2 shadow-md z-10 ${
-                isLiked(currentProductVariant.id) ? "bg-white border-none" : "bg-black border border-black"
-              }`}
-            >
-              {isLiked(currentProductVariant.id) ? (
-                <AiFillHeart className="w-6 h-6 text-teal-400" aria-label="unlike" />
-              ) : (
-                <AiOutlineHeart className="w-6 h-6 text-white" aria-label="like" />
-              )}
-            </button>
-          </div>
-          <Swiper
-            onSwiper={setThumbsSwiper}
-            spaceBetween={10}
-            slidesPerView={4}
-            freeMode={true}
-            watchSlidesProgress={true}
-            modules={[FreeMode, Navigation, Thumbs]}
-            className="mySwiper w-full max-w-lg h-24"
-          >
-            {currentProductVariant.images.map((image, index) => (
-              <SwiperSlide key={index}>
-                <img
-                  src={image || "/placeholder.svg"}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover rounded-md cursor-pointer border border-gray-200 hover:border-blue-500 transition-colors"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-
-        {/* Product Details */}
-        <div className="w-full lg:w-1/2">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
-          <p className="text-gray-600 mb-4">{currentProductVariant.brand}</p>
-
-          <div className="flex items-center mb-4">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("article")}:</span>
-            <span className="text-lg text-gray-600">{currentProductVariant.id}</span>
-          </div>
-
-          <div className="flex items-center mb-4">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("gender")}:</span>
-            <span className="text-lg text-gray-600">{t(currentProductVariant.gender.toLowerCase())}</span>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">{t("availableSizes")}</h3>
-            <div className="flex flex-wrap gap-2">
-              {availableSizes.length > 0 ? (
-                availableSizes.map((size: ProductSizeType) => (
-                  <Button
-                    key={size.size}
-                    variant={selectedSize === size.size ? "default" : "outline"}
-                    onClick={() => handleSizeSelect(size.size)}
-                    disabled={!size.inStock}
-                    className={`px-4 py-2 rounded-md ${!size.inStock ? "opacity-50 cursor-not-allowed" : ""}`}
+        <div className="flex flex-col lg:flex-row gap-5">
+          <div className="w-full lg:w-1/2 flex flex-col">
+            <div className="relative w-full  mb-4">
+              <Swiper
+                spaceBetween={10}
+                thumbs={{ swiper: thumbsSwiper }}
+                modules={[FreeMode, Thumbs]}
+                className="mySwiper2 rounded-2xl"
+              >
+                {currentProductVariant.images.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={image}
+                      alt={`${currentProductVariant.productName} ${index + 1}`}
+                      className="w-full h-auto object-cover max-h-[450px]"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+              <button
+                onClick={(e) => handleToggleLike(e)}
+                className={`absolute top-4 right-4 rounded-full p-2 shadow-md z-10 ${
+                  isLiked(currentProductVariant.id) ? "bg-white border-none" : ""
+                }`}
+              >
+                {isLiked(currentProductVariant.id) ? (
+                  <AiFillHeart className="w-6 h-6 text-teal-400" aria-label="unlike" />
+                ) : (
+                  <AiOutlineHeart className="w-6 h-6" aria-label="like" />
+                )}
+              </button>
+            </div>
+            <div className="w-full">
+              <Swiper
+                onSwiper={setThumbsSwiper}
+                spaceBetween={10}
+                slidesPerView="auto"
+                freeMode={true}
+                watchSlidesProgress={true}
+                modules={[FreeMode, Thumbs]}
+                className="mySwiper h-24 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100"
+              >
+                {currentProductVariant.images.map((image, index) => (
+                  <SwiperSlide
+                    key={index}
+                    className="!w-20 !h-20 flex-shrink-0" // Fixed width for each thumbnail
                   >
-                    {size.size}
-                  </Button>
-                ))
-              ) : (
-                <p className="text-gray-500">{t("no_available_sizes")}</p>
-              )}
+                    <img
+                      src={image || "/placeholder.svg"}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover rounded-md cursor-pointer border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           </div>
 
-          <div className="flex items-center mb-4">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("color")}:</span>
-            <div className="flex gap-2">
-              {uniqueColorVariants.map((variant) => {
-                const color = categoriesData.colors.find((c: Color) => c.id === variant.color)
-                const isSelected = variant.id === currentProductVariant.id
-                return (
-                  <button
-                    key={variant.id}
-                    onClick={() => navigate(`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`)}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                      isSelected ? "border-blue-500 ring-2 ring-blue-300" : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    style={{ backgroundColor: color?.color || "#000000" }}
-                    title={getColorName(variant.color)}
-                    aria-label={`Select color ${getColorName(variant.color)}`}
-                  >
-                    {isSelected && <FiCheck className="w-4 h-4 text-white drop-shadow-sm" />}
-                  </button>
-                )
-              })}
+          <div className="w-full lg:w-1/2">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
+            <p className="text-gray-600 mb-4">{currentProductVariant.brand}</p>
+
+            <div className="flex items-center mb-4">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("article")}:</span>
+              <span className="text-lg text-gray-600">{currentProductVariant.id}</span>
             </div>
-          </div>
 
-          <div className="flex items-center mb-4">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("materials")}:</span>
-            <span className="text-lg text-gray-600">{getMaterialName(currentProductVariant.materials)}</span>
-          </div>
+            <div className="flex items-center mb-4">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("gender")}:</span>
+              <span className="text-lg text-gray-600">{t(currentProductVariant.gender.toLowerCase())}</span>
+            </div>
 
-          <div className="flex items-center mb-4">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("season")}:</span>
-            <span className="text-lg text-gray-600">{getSeasonName(currentProductVariant.season)}</span>
-          </div>
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">{t("availableSizes")}</h3>
+              <div className="flex flex-wrap gap-2">
+                {availableSizes.length > 0 ? (
+                  availableSizes.map((size: ProductSizeType) => (
+                    <Button
+                      key={size.size}
+                      variant={selectedSize === size.size ? "default" : "outline"}
+                      onClick={() => handleSizeSelect(size.size)}
+                      disabled={!size.inStock}
+                      className={`px-4 py-2 rounded-md ${!size.inStock ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      {size.size}
+                    </Button>
+                  ))
+                ) : (
+                  <p className="text-gray-500">{t("no_available_sizes")}</p>
+                )}
+              </div>
+            </div>
 
-          <div className="flex items-center mb-6">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("year")}:</span>
-            <span className="text-lg text-gray-600">{currentProductVariant.year}</span>
-          </div>
+            <div className="flex items-center mb-4">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("color")}:</span>
+              <div className="flex gap-2">
+                {uniqueColorVariants.map((variant) => {
+                  const color = categoriesData.colors.find((c: Color) => c.id === variant.color)
+                  const isSelected = variant.id === currentProductVariant.id
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => navigate(`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`)}
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                        isSelected ? "border-blue-500 ring-2 ring-blue-300" : "border-gray-300 hover:border-gray-400"
+                      }`}
+                      style={{ backgroundColor: color?.color }}
+                      title={getColorName(variant.color)}
+                      aria-label={`Select color ${getColorName(variant.color)}`}
+                    >
+                      {isSelected && <FiCheck className="w-4 h-4 text-white drop-shadow-sm" />}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
 
-          <div className="flex items-center mb-6">
-            <span className="text-xl font-semibold text-gray-800 mr-2">{t("price")}:</span>
-            {displayDiscount < displayPrice ? (
-              <>
-                <span className="text-2xl font-bold text-green-600 mr-2">
-                  {formatPrice(displayDiscount)} {currency.toUpperCase()}
-                </span>
-                <span className="text-lg text-red-400 line-through">
+            <div className="flex items-center mb-4">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("materials")}:</span>
+              <span className="text-lg text-gray-600">{getMaterialName(currentProductVariant.materials)}</span>
+            </div>
+
+            <div className="flex items-center mb-4">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("season")}:</span>
+              <span className="text-lg text-gray-600">{getSeasonName(currentProductVariant.season)}</span>
+            </div>
+
+            <div className="flex items-center mb-6">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("year")}:</span>
+              <span className="text-lg text-gray-600">{currentProductVariant.year}</span>
+            </div>
+
+            <div className="flex items-center mb-6">
+              <span className="text-xl font-semibold text-gray-800 mr-2">{t("price")}:</span>
+              {displayDiscount < displayPrice ? (
+                <>
+                  <span className="text-sm sm:text-xl mt-1 font-bold text-green-600 mr-2">
+                    {formatPrice(displayDiscount)} {currency.toUpperCase()}
+                  </span>
+                  <span className="text-xs text-red-400 mt-1 line-through">
+                    {formatPrice(displayPrice)} {currency.toUpperCase()}
+                  </span>
+                  <span className="ml-2 bg-red-500 text-white p-1 rounded text-sm font-semibold">
+                    -{Math.round(((displayPrice - displayDiscount) / displayPrice) * 100)}%
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-gray-900">
                   {formatPrice(displayPrice)} {currency.toUpperCase()}
                 </span>
-                <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                  -{Math.round(((displayPrice - displayDiscount) / displayPrice) * 100)}%
-                </span>
-              </>
-            ) : (
-              <span className="text-2xl font-bold text-gray-900">
-                {formatPrice(displayPrice)} {currency.toUpperCase()}
-              </span>
-            )}
-          </div>
-
-          {currentProductVariant.inAdvancePayment && (
-            <div className="mb-4 text-blue-700 font-medium">
-              <p>
-                {t("in_advance_payment_details")}{" "}
-                <span className="font-bold">
-                  {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
-                </span>
-              </p>
+              )}
             </div>
-          )}
 
-          <div className="flex flex-col gap-4 mb-6">
-            {cartItem && cartItem.quantity > 0 ? (
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-gray-300 rounded-lg">
-                  <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 0}>
-                    <FaMinus className="w-4 h-4" />
-                  </Button>
-                  <span className="px-4 text-lg font-medium">{quantity}</span>
-                  <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)}>
-                    <FaPlus className="w-4 h-4" />
+            {currentProductVariant.inAdvancePayment && (
+              <div className="mb-4 text-blue-700 font-medium">
+                <p>
+                  {t("in_advance_payment_details")}{" "}
+                  <span className="font-bold">
+                    {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
+                  </span>
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4 mb-6">
+              {cartItem && cartItem.quantity > 0 ? (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center border border-gray-300 rounded-lg">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 0}
+                    >
+                      <FaMinus className="w-4 h-4" />
+                    </Button>
+                    <span className="px-4 text-lg font-medium">{quantity}</span>
+                    <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)}>
+                      <FaPlus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <FaShoppingCart className="mr-3 w-5 h-5" /> {t("add_to_cart")}
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  <FaShoppingCart className="mr-3 w-5 h-5" /> {t("add_to_cart")}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {currentProductVariant.poizonLink && (
-            <div className="mb-6">
-              <a
-                href={currentProductVariant.poizonLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-lg"
-              >
-                {t("poizon_link")}
-              </a>
+              )}
             </div>
-          )}
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("description")}</h3>
-            <p className="text-gray-700 leading-relaxed">{getLocalizedName(currentProductVariant.description)}</p>
           </div>
+        </div>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("description")}</h3>
+          <p className="text-gray-700 leading-relaxed">{getLocalizedName(currentProductVariant.description)}</p>
+        </div>
 
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("composition")}</h3>
-            <p className="text-gray-700 leading-relaxed">{getMaterialName(currentProductVariant.materials)}</p>
-          </div>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("composition")}</h3>
+          <p className="text-gray-700 leading-relaxed">{getMaterialName(currentProductVariant.materials)}</p>
+        </div>
 
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("rating")}</h3>
-            <p className="text-gray-700 leading-relaxed">{currentProductVariant.rating}/5</p>
-          </div>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("rating")}</h3>
+          <p className="text-gray-700 leading-relaxed">{currentProductVariant.rating}/5</p>
         </div>
       </div>
     </div>

@@ -63,5 +63,13 @@
   "women": "ayol",
   "unisex": "uniseks",
   "filters": "Filtrlar",
-  "clear_all": "Barchasini tozalash"
+  "clear_all": "Barchasini tozalash",
+  "no_results_for_query": "\"{{query}}\" uchun hech qanday natija topilmadi",
+  "admin": "Agar yordam kerak bo'lsa, admin bilan bog'laning.",
+  "search_suggestions": "Qidiruv Takliflari",
+  "view_all_results": "Barcha natijalarni ko'rish",
+  "clear_search": "Qidiruvni tozalash",
+  "products_you_might_like": "Sizga yoqishi mumkin bo'lgan mahsulotlar",
+  "view_all_products": "Barcha mahsulotlarni ko'rish",
+  "back_to_home": "Bosh sahifaga qaytish"
 }

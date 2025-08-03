@@ -188,6 +188,10 @@ const initialState: ProductState = {
               "https://i.postimg.cc/rmyFKV04/42.jpg",
               "https://i.postimg.cc/hPVjy5Bf/43.jpg",
               "https://i.postimg.cc/523t1QjJ/44.jpg",
+              "https://i.postimg.cc/rmyFKV04/42.jpg",
+              "https://i.postimg.cc/hPVjy5Bf/43.jpg",
+              "https://i.postimg.cc/523t1QjJ/44.jpg",
+              "https://i.postimg.cc/k5bWfyfs/41.jpg",
             ],
             sizes: [
               { size: 40, inStock: true, sold: 10, price: { usd: 220, uzs: 2700000 }, discount: { usd: 200, uzs: 2500000 } },

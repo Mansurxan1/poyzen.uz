@@ -108,5 +108,13 @@
   "arch_support": "Поддержка свода стопы",
   "memory_foam": "Пена с памятью",
   "gel_cushioning": "Гелевая подушка",
-  "air_cushioning": "Воздушная подушка"
+  "air_cushioning": "Воздушная подушка",
+  "no_results_for_query": "По запросу \"{{query}}\" ничего не найдено",
+  "admin": "Если вам нужна помощь, свяжитесь с администратором",
+  "search_suggestions": "Предложения поиска",
+  "view_all_results": "Посмотреть все результаты",
+  "clear_search": "Очистить поиск",
+  "products_you_might_like": "Товары, которые могут вам понравиться",
+  "view_all_products": "Посмотреть все товары",
+  "back_to_home": "Вернуться на главную"
 }

@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import "./styles/scrollbar.css";
+
+.swiper{
+    margin-left: 0 !important;
+}
