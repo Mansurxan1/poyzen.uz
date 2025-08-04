@@ -482,7 +482,7 @@ const ProductDetails: React.FC = () => {
                       onClick={() => {
                         window.location.href = `/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`
                       }}
-                      className={`w-8 h-8 rounded-full flex cursor-pointer items-center justify-center transition-all ${
+                      className={`w-8 h-8 border rounded-full flex cursor-pointer items-center justify-center transition-all ${
                         isSelected ? "border-blue-500 border-2" : ""
                       }`}
                       style={{ backgroundColor: color?.color }}
