@@ -1,18 +1,18 @@
-import type React from "react"
-import { useState, useMemo, useEffect } from "react"
-import { useParams, Link, useNavigate } from "react-router-dom"
+import React, { useState, useMemo, useEffect } from "react"
+import { useParams, Link } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { FreeMode, Thumbs } from "swiper/modules"
-import { Heart, Plus, Minus, ShoppingCart, Check, Star, ChevronRight, Bell, Mail, Pin, CheckCircle } from "lucide-react"
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
+import { Plus, Minus, ShoppingCart, Check, Star, ChevronRight } from "lucide-react"
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
 import Button from "@/components/ui/button"
 import Card from "@/components/ui/card"
 import Badge from "@/components/ui/badge"
-import Separator from "@/components/ui/separator"
+import BuyConfirmationModal from "@/components/common/BuyConfirmationModal"
 import type {
   Color,
   Material,
@@ -34,7 +34,6 @@ const ProductDetails: React.FC = () => {
   const { t } = useTranslation()
   const { brand, nameUrl, id } = useParams<{ brand: string; nameUrl: string; id: string }>()
   const dispatch: AppDispatch = useDispatch()
-  const navigate = useNavigate()
   const { currency, formatPrice } = useCurrency()
   const { toggleLike, isLiked } = useProductLikes()
 
@@ -201,9 +200,9 @@ const ProductDetails: React.FC = () => {
       dispatch(addToast({ message: t("cart_cleared_for_product"), type: "info" }))
 
       const telegramUrl = `https://t.me/poyzenuzbot?start=${currentProductVariant.id}-${selectedSizeDetails.size}-${quantity}`
-      window.location.href = telegramUrl
+      window.open(telegramUrl, "_blank") // Open Telegram in a new tab
+      setIsModalOpen(false)
     }
-    setIsModalOpen(false)
   }
 
   const handleToggleLike = (e: React.MouseEvent) => {
@@ -273,7 +272,7 @@ const ProductDetails: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             <Card className="overflow-hidden">
@@ -291,21 +290,28 @@ const ProductDetails: React.FC = () => {
                         src={image || "/placeholder.svg"}
                         alt={`${currentProductVariant.productName} ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder.svg" // Fallback on error
+                        }}
                       />
                     </SwiperSlide>
                   ))}
                 </Swiper>
 
-                <Button
-                  variant="secondary"
-                  size="icon"
+                <button
                   onClick={handleToggleLike}
-                  className="absolute top-4 right-4 rounded-full shadow-lg z-10"
+                  className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 transition-all duration-300 ease-in-out transform hover:scale-110 ${
+                    isLiked(currentProductVariant.id)
+                      ? "bg-white border-none shadow-lg scale-110"
+                      : "bg-white/80 hover:bg-white"
+                  }`}
                 >
-                  <Heart
-                    className={`w-5 h-5 ${isLiked(currentProductVariant.id) ? "fill-red-500 text-red-500" : ""}`}
-                  />
-                </Button>
+                  {isLiked(currentProductVariant.id) ? (
+                    <AiFillHeart className="w-5 h-5 text-teal-400 animate-pulse" />
+                  ) : (
+                    <AiOutlineHeart className="w-5 h-5 text-gray-600 hover:text-teal-400 transition-colors duration-200" />
+                  )}
+                </button>
 
                 {discountPercentage > 0 && (
                   <Badge className="absolute z-20 top-4 left-4 bg-red-500 text-white font-bold text-lg py-2 px-4 rounded-lg shadow-md">
@@ -336,6 +342,9 @@ const ProductDetails: React.FC = () => {
                         src={image || "/placeholder.svg"}
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder.svg" // Fallback on error
+                        }}
                       />
                     </div>
                   </SwiperSlide>
@@ -344,7 +353,7 @@ const ProductDetails: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
               <p className="text-lg text-gray-600 mb-4">{currentProductVariant.brand}</p>
@@ -366,7 +375,7 @@ const ProductDetails: React.FC = () => {
               </div>
             </div>
 
-            <Card className="p-6">
+            <Card className="p-4">
               <h3 className="text-lg font-semibold mb-4">Mahsulot ma'lumotlari</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
@@ -401,7 +410,9 @@ const ProductDetails: React.FC = () => {
                   return (
                     <button
                       key={variant.id}
-                      onClick={() => navigate(`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`)}
+                      onClick={() => {
+                        window.location.href = `/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`
+                      }}
                       className={`w-8 h-8 rounded-full border-4 flex items-center justify-center transition-all ${
                         isSelected ? "border-blue-500 scale-110" : "border-gray-300 hover:border-gray-400"
                       }`}
@@ -448,22 +459,21 @@ const ProductDetails: React.FC = () => {
             )}
 
             <div className="flex items-center gap-3 mb-6">
-                {discountPercentage > 0 ? (
-                  <>
-                    <span className="text-xl sm:text-3xl font-bold text-green-600">
-                      {formatPrice(displayDiscount)} {currency.toUpperCase()}
-                    </span>
-                    <span className="text-xl text-gray-400 line-through">
-                      {formatPrice(displayPrice)} {currency.toUpperCase()}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-3xl font-bold text-gray-900">
+              {discountPercentage > 0 ? (
+                <>
+                  <span className="text-xl sm:text-3xl font-bold text-green-600">
+                    {formatPrice(displayDiscount)} {currency.toUpperCase()}
+                  </span>
+                  <span className="text-xl text-gray-400 line-through">
                     {formatPrice(displayPrice)} {currency.toUpperCase()}
                   </span>
-                )}
-              </div>
-              
+                </>
+              ) : (
+                <span className="text-3xl font-bold text-gray-900">
+                  {formatPrice(displayPrice)} {currency.toUpperCase()}
+                </span>
+              )}
+            </div>
 
             <div className="space-y-4">
               <div className="flex items-center gap-4">
@@ -487,7 +497,7 @@ const ProductDetails: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button
-                  onClick={cartItem && cartItem.quantity > 0 ? () => navigate(`/${language}/cart`) : handleAddToCart}
+                  onClick={cartItem && cartItem.quantity > 0 ? () => window.location.href = `/${language}/cart` : handleAddToCart}
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
                   variant="outline"
                   size="lg"
@@ -510,58 +520,17 @@ const ProductDetails: React.FC = () => {
           </div>
         </div>
 
-        <Card className="mt-8 p-6">
+        <Card className="mt-8 p-4">
           <h3 className="text-xl font-semibold mb-4">Mahsulot haqida</h3>
           <p className="text-gray-700 leading-relaxed text-lg">{getLocalizedName(currentProductVariant.description)}</p>
         </Card>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full p-6">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <Bell className="w-12 h-12 text-yellow-500" />
-              </div>
-
-              <h2 className="text-xl font-bold">Diqqat!</h2>
-
-              <div className="space-y-3 text-left">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm">
-                    Sizni hozir Telegram botga yo'naltiramiz. Iltimos, bot ochilgach, "Start" tugmasini bosing.
-                  </p>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm">Bu tugma orqali sizning buyurtmangiz tasdiqlanadi.</p>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Pin className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold">Muhim!</p>
-                    <p className="text-sm">Agar siz "Start" tugmasini bosmasangiz, admin siz bilan bog'lana olmaydi.</p>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex gap-3">
-                <Button onClick={() => setIsModalOpen(false)} variant="outline" className="flex-1">
-                  Bekor qilish
-                </Button>
-                <Button onClick={handleConfirmBuy} className="flex-1 bg-green-500 hover:bg-green-600">
-                  Tasdiqlash
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
+      <BuyConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmBuy}
+      />
     </div>
   )
 }

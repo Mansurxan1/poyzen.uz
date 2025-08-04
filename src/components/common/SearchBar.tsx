@@ -1,4 +1,3 @@
-// src/components/SearchBar.tsx
 import type React from "react";
 import { useRef, useEffect, useState } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
@@ -27,8 +26,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
   const handleSearchSubmit = (query: string) => {
     if (query.trim()) {
       navigate(`/${currentLang}/search?q=${encodeURIComponent(query.trim())}`);
-      toggleSearch();
-      setSearchQuery("");
+      setSearchQuery(""); // Clear the input after submission
+      toggleSearch(); // Close the search bar after submission
     }
   };
 
@@ -36,6 +35,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
     if (e.key === "Enter") {
       handleSearchSubmit(searchQuery);
     } else if (e.key === "Escape") {
+      setSearchQuery(""); // Clear input on escape
       toggleSearch();
     }
   };
@@ -53,7 +53,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
         } absolute top-0 left-0 w-full shadow-lg max-h-screen overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-7xl mx-auto sm:px-4 py-4">
+        <div className="max-w-7xl mx-auto p-4">
           <div className="relative max-w-2xl mx-auto">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <FiSearch className="h-5 w-5 text-gray-400" />
@@ -68,6 +68,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
               onKeyDown={handleKeyDown}
             />
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+              <Button
+                onClick={() => handleSearchSubmit(searchQuery)}
+                variant="ghost"
+                size="icon"
+                className="text-gray-400 hover:text-blue-600 mr-2"
+              >
+                <FiSearch className="h-5 w-5" />
+              </Button>
               <Button
                 onClick={toggleSearch}
                 variant="ghost"

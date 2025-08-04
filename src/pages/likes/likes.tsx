@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { FaShoppingCart, FaHome } from 'react-icons/fa';
-
 import type { RootState } from '@/redux';
 import ProductCard from '@/pages/productAll/components/ProductCard'; 
 import Button from '@/components/ui/button';
@@ -25,10 +24,10 @@ const Likes: React.FC = () => {
   }, []);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 max-w-7xl mx-auto">
+    <section className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 sm:px-4 max-w-7xl mx-auto">
       {likedProducts.length > 0 && (
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
             {t('likedProducts')}
           </h1>
         </header>
@@ -66,7 +65,7 @@ const Likes: React.FC = () => {
         </div>
       ) : (
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 auto-rows-fr"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 auto-rows-fr"
           role="grid"
         >
           {likedProducts.map((item) => (

@@ -1,85 +1,84 @@
-import React from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
-import { FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa"
-import { useTranslation } from "react-i18next"
-import { useSelector, useDispatch } from "react-redux"
-import type { RootState, AppDispatch } from "@/redux"
-import { setCurrency } from "@/features/currencySlice"
-import { setLanguage } from "@/features/languageSlice"
-import SearchBar from "@/components/common/SearchBar"
-import Dropdown from "@/components/ui/dropdown" 
-import Button from "@/components/ui/button" 
-
-import logo from "@/assets/logo.png"
+import React from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "@/redux";
+import { setCurrency } from "@/features/currencySlice";
+import { setLanguage } from "@/features/languageSlice";
+import SearchBar from "@/components/common/SearchBar";
+import Dropdown from "@/components/ui/dropdown";
+import Button from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 const Navbar: React.FC = () => {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const dispatch: AppDispatch = useDispatch()
-  const currentLang = useSelector((state: RootState) => state.language.language)
-  const currentCurrency = useSelector((state: RootState) => state.currency.currency)
-  const likedProducts = useSelector((state: RootState) => state.likes.likedProducts)
-  const cartItems = useSelector((state: RootState) => state.cart.items)
-  const likeCount = likedProducts.length
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false)
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch: AppDispatch = useDispatch();
+  const currentLang = useSelector((state: RootState) => state.language.language);
+  const currentCurrency = useSelector((state: RootState) => state.currency.currency);
+  const likedProducts = useSelector((state: RootState) => state.likes.likedProducts);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const likeCount = likedProducts.length;
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   const navLinks = [
     { to: "/", label: t("home") },
     { to: "/brands", label: t("brands") },
     { to: "/products", label: t("products") },
     { to: "/contact", label: t("contact") },
-  ]
+  ];
 
   const languageOptions = [
     { value: "uz", label: "UZB" },
     { value: "ru", label: "РУС" },
-  ]
+  ];
 
   const currencyOptions = [
     { value: "usd", label: "USD" },
     { value: "uzs", label: "UZS" },
-  ]
+  ];
 
-  const toggleSearch = () => setIsSearchOpen((prev) => !prev)
-  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev)
+  const toggleSearch = () => setIsSearchOpen((prev) => !prev);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   const handleCurrencyChange = (val: string) => {
-    dispatch(setCurrency(val))
-  }
+    dispatch(setCurrency(val));
+  };
 
   const handleLanguageChange = (newLangValue: string) => {
-    if (currentLang === newLangValue) return
-    dispatch(setLanguage(newLangValue))
-    const currentPath = window.location.pathname
-    const pathSegments = currentPath.split("/").filter(Boolean)
-    const knownLanguages = languageOptions.map((opt) => opt.value)
-    let targetPath: string
+    if (currentLang === newLangValue) return;
+    dispatch(setLanguage(newLangValue));
+    const currentPath = window.location.pathname;
+    const pathSegments = currentPath.split("/").filter(Boolean);
+    const knownLanguages = languageOptions.map((opt) => opt.value);
+    let targetPath: string;
     if (pathSegments.length > 0 && knownLanguages.includes(pathSegments[0])) {
-      pathSegments[0] = newLangValue
-      targetPath = `/${pathSegments.join("/")}`
+      pathSegments[0] = newLangValue;
+      targetPath = `/${pathSegments.join("/")}`;
     } else {
-      targetPath = `/${newLangValue}/${pathSegments.join("/")}`
+      targetPath = `/${newLangValue}/${pathSegments.join("/")}`;
     }
-    navigate(targetPath)
-  }
+    navigate(targetPath);
+  };
 
   const handleLikesClick = () => {
-    navigate(`/${currentLang}/likes`)
-    setIsMobileMenuOpen(false) 
-  }
+    navigate(`/${currentLang}/likes`);
+    setIsMobileMenuOpen(false);
+  };
 
   const handleCartClick = () => {
-    navigate(`/${currentLang}/cart`)
-    setIsMobileMenuOpen(false) 
-  }
+    navigate(`/${currentLang}/cart`);
+    setIsMobileMenuOpen(false);
+  };
 
   const handleProfileClick = () => {
-    window.open("https://www.google.com", "_blank") 
-    setIsMobileMenuOpen(false) 
-  }
+    window.open("https://www.google.com", "_blank");
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className="sticky top-0 z-50">
@@ -227,7 +226,7 @@ const Navbar: React.FC = () => {
       </nav>
       <SearchBar isSearchOpen={isSearchOpen} toggleSearch={toggleSearch} />
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

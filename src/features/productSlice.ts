@@ -92,7 +92,7 @@ const initialState: ProductState = {
               { size: 41, inStock: false, sold: 8, price: { usd: 135, uzs: 1650000 }, discount: { usd: 125, uzs: 1550000 } },
               { size: 42, inStock: true, sold: 6, price: { usd: 140, uzs: 1700000 }, discount: { usd: 130, uzs: 1600000 } },
               { size: 43, inStock: true, sold: 4, price: { usd: 145, uzs: 1750000 }, discount: { usd: 135, uzs: 1650000 } },
-              { size: 44, inStock: false, sold: 2, price: { usd: 150, uzs: 1800000 }, discount: { usd: 140, uzs: 1700000 } },
+              { size: 44.5, inStock: true, sold: 2, price: { usd: 150, uzs: 1800000 }, discount: { usd: 140, uzs: 1700000 } },
             ],
             inStock: true,
             inAdvancePayment: true,

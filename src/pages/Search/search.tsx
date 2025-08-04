@@ -1,4 +1,3 @@
-// src/pages/Search.tsx
 import type React from "react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,9 +13,9 @@ const SectionHeader: React.FC<{
   title: string;
   count?: number;
 }> = ({ icon, title, count }) => (
-  <div className="flex items-center gap-3 px-4 mb-6">
+  <div className="flex items-center gap-3 mb-6">
     {icon}
-    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+    <h2 className="font-bold text-gray-800">{title}</h2>
     {count !== undefined && (
       <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
         {count} ta natija
@@ -57,7 +56,7 @@ const Search: React.FC = () => {
           </section>
         ) : (
           <section className="text-center mb-8" aria-labelledby="no-results">
-            <h3 id="no-results" className="text-2xl font-bold text-gray-700 mb-3">
+            <h3 id="no-results" className="text-lg sm:text-2xl font-bold text-gray-700 mb-3">
               {t("no_results_for_query", { query: searchQuery })}
             </h3>
             <p className="text-gray-500 mb-6 text-lg">
