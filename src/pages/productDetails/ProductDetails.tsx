@@ -12,10 +12,11 @@ import { Plus, Minus, ShoppingCart, Check, Star, ChevronRight } from "lucide-rea
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import  Button from "@/components/ui/button"
-import  Card from "@/components/ui/card"
-import  Badge  from "@/components/ui/badge"
+import Button  from "@/components/ui/button"
+import Card  from "@/components/ui/card"
+import Badge  from "@/components/ui/badge"
 import BuyConfirmationModal from "@/components/common/BuyConfirmationModal"
+import ImageViewerModal from "./components/ImageViewerModal" // Yangi import
 import type {
   Color,
   Material,
@@ -50,7 +51,10 @@ const ProductDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
-  // State for image zoom
+  // Rasm ko'rish modalini boshqarish holati
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+
+  // State for desktop hover zoom
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomLensPosition, setZoomLensPosition] = useState({ x: 0, y: 0 })
   const [zoomBgOffset, setZoomBgOffset] = useState({ x: 0, y: 0 })
@@ -59,8 +63,8 @@ const ProductDetails: React.FC = () => {
   // State to determine if it's a desktop view (for zoom functionality)
   const [isDesktop, setIsDesktop] = useState(false)
 
-  const zoomFactor = 2.5 // How much to zoom
-  const lensSize = 150 // Size of the magnifying glass (square)
+  const zoomFactor = 2.5 // How much to zoom for desktop hover
+  const lensSize = 150 // Size of the magnifying glass (square) for desktop hover
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -248,9 +252,9 @@ const ProductDetails: React.FC = () => {
     return season ? getLocalizedName(season.name) : t("unknown_season")
   }
 
-  // Zoom handlers (only active on desktop)
+  // Desktop hover zoom handlers
   const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDesktop || !mainImageContainerRef.current) return
+    if (!mainImageContainerRef.current) return
 
     const { left, top, width, height } = mainImageContainerRef.current.getBoundingClientRect()
     const mouseX = e.clientX - left // Mouse X relative to container
@@ -274,12 +278,10 @@ const ProductDetails: React.FC = () => {
   }
 
   const handleImageMouseEnter = () => {
-    if (!isDesktop) return
     setIsZoomed(true)
   }
 
   const handleImageMouseLeave = () => {
-    if (!isDesktop) return
     setIsZoomed(false)
   }
 
@@ -332,26 +334,29 @@ const ProductDetails: React.FC = () => {
             <Card className="overflow-hidden">
               <div
                 ref={mainImageContainerRef}
-                className="relative w-full aspect-square" // Ensure container has defined dimensions
+                className="relative w-full aspect-square"
+                // Desktop uchun hover zoom, mobil uchun click modal
                 onMouseEnter={isDesktop ? handleImageMouseEnter : undefined}
                 onMouseLeave={isDesktop ? handleImageMouseLeave : undefined}
                 onMouseMove={isDesktop ? handleImageMouseMove : undefined}
+                onClick={isDesktop ? undefined : () => setIsImageViewerOpen(true)} // Faqat mobil uchun click
+                style={{ cursor: isDesktop ? "default" : "pointer" }} // Kursor stilini o'zgartirish
               >
                 <Swiper
                   spaceBetween={10}
                   thumbs={{ swiper: thumbsSwiper }}
                   modules={[FreeMode, Thumbs]}
                   onSlideChange={(swiper) => setActiveImageIndex(swiper.activeIndex)}
-                  className="w-full h-full" // Swiper should fill its container
+                  className="w-full h-full"
                 >
                   {currentProductVariant.images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <img
                         src={image || "/placeholder.svg"}
                         alt={`${currentProductVariant.productName} ${index + 1}`}
-                        className="w-full h-full object-contain" // Use object-contain to prevent cropping
+                        className="w-full h-full object-contain"
                         onError={(e) => {
-                          e.currentTarget.src = "/placeholder.svg" // Fallback on error
+                          e.currentTarget.src = "/placeholder.svg"
                         }}
                       />
                     </SwiperSlide>
@@ -377,7 +382,7 @@ const ProductDetails: React.FC = () => {
                   </Badge>
                 )}
 
-                {/* Zoom Lens Overlay - Only visible on large screens and if isZoomed */}
+                {/* Zoom Lens Overlay - Faqat desktopda va isZoomed bo'lsa ko'rinadi */}
                 {isZoomed && isDesktop && (
                   <div
                     className="absolute z-30 border-2 border-blue-500 rounded-full overflow-hidden pointer-events-none"
@@ -416,7 +421,7 @@ const ProductDetails: React.FC = () => {
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "/placeholder.svg" // Fallback on error
+                          e.currentTarget.src = "/placeholder.svg"
                         }}
                       />
                     </div>
@@ -482,7 +487,7 @@ const ProductDetails: React.FC = () => {
                       onClick={() => {
                         window.location.href = `/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`
                       }}
-                      className={`w-8 h-8 border rounded-full flex cursor-pointer items-center justify-center transition-all ${
+                      className={`w-8 h-8 rounded-full flex cursor-pointer items-center justify-center transition-all ${
                         isSelected ? "border-blue-500 border-2" : ""
                       }`}
                       style={{ backgroundColor: color?.color }}
@@ -592,6 +597,16 @@ const ProductDetails: React.FC = () => {
         </Card>
       </div>
       <BuyConfirmationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmBuy} />
+
+      {/* Rasm ko'rish modalini render qilish - Faqat mobil qurilmalarda */}
+      {isImageViewerOpen && !isDesktop && currentProductVariant.images[activeImageIndex] && (
+        <ImageViewerModal
+          src={currentProductVariant.images[activeImageIndex] || "/placeholder.svg"}
+          alt={currentProductVariant.productName}
+          isOpen={isImageViewerOpen}
+          onClose={() => setIsImageViewerOpen(false)}
+        />
+      )}
     </div>
   )
 }
