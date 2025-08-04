@@ -12,8 +12,8 @@ import { Plus, Minus, ShoppingCart, Check, Star, ChevronRight } from "lucide-rea
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import Button  from "@/components/ui/button"
-import Card  from "@/components/ui/card"
+import  Button from "@/components/ui/button"
+import  Card from "@/components/ui/card"
 import  Badge  from "@/components/ui/badge"
 import BuyConfirmationModal from "@/components/common/BuyConfirmationModal"
 import type {
@@ -56,11 +56,23 @@ const ProductDetails: React.FC = () => {
   const [zoomBgOffset, setZoomBgOffset] = useState({ x: 0, y: 0 })
   const mainImageContainerRef = useRef<HTMLDivElement>(null) // Ref for the container holding the main image Swiper
 
+  // State to determine if it's a desktop view (for zoom functionality)
+  const [isDesktop, setIsDesktop] = useState(false)
+
   const zoomFactor = 2.5 // How much to zoom
   const lensSize = 150 // Size of the magnifying glass (square)
 
   useEffect(() => {
     window.scrollTo(0, 0)
+
+    // Set initial desktop state and add resize listener
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024) // Tailwind's 'lg' breakpoint
+    }
+
+    handleResize() // Set initial value
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   const currentProductVariant = useMemo(() => {
@@ -236,9 +248,9 @@ const ProductDetails: React.FC = () => {
     return season ? getLocalizedName(season.name) : t("unknown_season")
   }
 
-  // Zoom handlers
+  // Zoom handlers (only active on desktop)
   const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!mainImageContainerRef.current) return
+    if (!isDesktop || !mainImageContainerRef.current) return
 
     const { left, top, width, height } = mainImageContainerRef.current.getBoundingClientRect()
     const mouseX = e.clientX - left // Mouse X relative to container
@@ -262,10 +274,12 @@ const ProductDetails: React.FC = () => {
   }
 
   const handleImageMouseEnter = () => {
+    if (!isDesktop) return
     setIsZoomed(true)
   }
 
   const handleImageMouseLeave = () => {
+    if (!isDesktop) return
     setIsZoomed(false)
   }
 
@@ -319,9 +333,9 @@ const ProductDetails: React.FC = () => {
               <div
                 ref={mainImageContainerRef}
                 className="relative w-full aspect-square" // Ensure container has defined dimensions
-                onMouseEnter={handleImageMouseEnter}
-                onMouseLeave={handleImageMouseLeave}
-                onMouseMove={handleImageMouseMove}
+                onMouseEnter={isDesktop ? handleImageMouseEnter : undefined}
+                onMouseLeave={isDesktop ? handleImageMouseLeave : undefined}
+                onMouseMove={isDesktop ? handleImageMouseMove : undefined}
               >
                 <Swiper
                   spaceBetween={10}
@@ -363,10 +377,10 @@ const ProductDetails: React.FC = () => {
                   </Badge>
                 )}
 
-                {/* Zoom Lens Overlay - Only visible on large screens */}
-                {isZoomed && (
+                {/* Zoom Lens Overlay - Only visible on large screens and if isZoomed */}
+                {isZoomed && isDesktop && (
                   <div
-                    className="lg:absolute lg:z-30 lg:border-2 lg:border-blue-500 lg:rounded-full lg:overflow-hidden lg:pointer-events-none"
+                    className="absolute z-30 border-2 border-blue-500 rounded-full overflow-hidden pointer-events-none"
                     style={{
                       left: zoomLensPosition.x,
                       top: zoomLensPosition.y,
