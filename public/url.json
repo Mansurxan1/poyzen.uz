@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "brand": "Nike",
+    "nameUrl": "air-max-270"
+  },
+  {
+    "id": 2,
+    "brand": "Adidas",
+    "nameUrl": "ultraboost-light"
+  },
+  {
+    "id": 3,
+    "brand": "Puma",
+    "nameUrl": "rs-x-efekt"
+  },
+  {
+    "id": 4,
+    "brand": "New Balance",
+    "nameUrl": "574-core"
+  },
+  {
+    "id": 5,
+    "brand": "Reebok",
+    "nameUrl": "classic-leather"
+  }
+]

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>https://poyzen.uz/ru</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/products</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/products"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/products"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/products"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brands</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brands"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brands"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brands"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/likes</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/likes"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/likes"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/likes"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/cart</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/cart"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/cart"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/cart"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brand/nike</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brand/nike"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brand/nike"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brand/nike"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/nike/air-max-270/1</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/nike/air-max-270/1"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/nike/air-max-270/1"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/nike/air-max-270/1"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brand/adidas</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brand/adidas"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brand/adidas"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brand/adidas"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/adidas/ultraboost-light/2</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/adidas/ultraboost-light/2"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/adidas/ultraboost-light/2"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/adidas/ultraboost-light/2"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brand/puma</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brand/puma"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brand/puma"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brand/puma"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/puma/rs-x-efekt/3</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/puma/rs-x-efekt/3"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/puma/rs-x-efekt/3"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/puma/rs-x-efekt/3"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brand/new-balance</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brand/new-balance"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brand/new-balance"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brand/new-balance"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/new-balance/574-core/4</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/new-balance/574-core/4"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/new-balance/574-core/4"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/new-balance/574-core/4"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/brand/reebok</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/brand/reebok"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/brand/reebok"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/brand/reebok"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://poyzen.uz/ru/reebok/classic-leather/5</loc>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://poyzen.uz/ru/reebok/classic-leather/5"/>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://poyzen.uz/uz/reebok/classic-leather/5"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://poyzen.uz/ru/reebok/classic-leather/5"/>
+    <lastmod>2025-08-04T14:26:51.747Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
