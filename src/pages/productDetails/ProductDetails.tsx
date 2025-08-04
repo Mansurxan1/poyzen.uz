@@ -12,8 +12,8 @@ import { Plus, Minus, ShoppingCart, Check, Star, ChevronRight } from "lucide-rea
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import  Button  from "@/components/ui/button"
-import  Card from "@/components/ui/card"
+import Button  from "@/components/ui/button"
+import Card  from "@/components/ui/card"
 import  Badge  from "@/components/ui/badge"
 import BuyConfirmationModal from "@/components/common/BuyConfirmationModal"
 import type {
@@ -363,10 +363,10 @@ const ProductDetails: React.FC = () => {
                   </Badge>
                 )}
 
-                {/* Zoom Lens Overlay */}
+                {/* Zoom Lens Overlay - Only visible on large screens */}
                 {isZoomed && (
                   <div
-                    className="absolute z-30 border-2 border-blue-500 rounded-full overflow-hidden pointer-events-none"
+                    className="lg:absolute lg:z-30 lg:border-2 lg:border-blue-500 lg:rounded-full lg:overflow-hidden lg:pointer-events-none"
                     style={{
                       left: zoomLensPosition.x,
                       top: zoomLensPosition.y,
