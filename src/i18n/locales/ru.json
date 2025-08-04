@@ -80,5 +80,8 @@
   "cancel": "Назад",
   "confirm": "Подтвердить",
   "emptyCart": "Ваша корзина пуста",
-  "addItemsToCart": "Добавьте товары в корзину"
+  "addItemsToCart": "Добавьте товары в корзину",
+  "searchResults": "Найденные товары",
+  "no_results_for_query": "Ничего не найдено",
+  "products_you_might_like": "Возможно, вам понравится:"
 }

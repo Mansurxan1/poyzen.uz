@@ -1,4 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react"
+"use client"
+
+import type React from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { useParams, Link } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -9,9 +12,9 @@ import { Plus, Minus, ShoppingCart, Check, Star, ChevronRight } from "lucide-rea
 import type { RootState, AppDispatch } from "@/redux"
 import { addItemToCart, updateItemQuantity, removeItemFromCart } from "@/features/cartSlice"
 import { addToast } from "@/features/toastSlice"
-import Button from "@/components/ui/button"
-import Card from "@/components/ui/card"
-import Badge from "@/components/ui/badge"
+import  Button  from "@/components/ui/button"
+import  Card from "@/components/ui/card"
+import  Badge  from "@/components/ui/badge"
 import BuyConfirmationModal from "@/components/common/BuyConfirmationModal"
 import type {
   Color,
@@ -36,7 +39,6 @@ const ProductDetails: React.FC = () => {
   const dispatch: AppDispatch = useDispatch()
   const { currency, formatPrice } = useCurrency()
   const { toggleLike, isLiked } = useProductLikes()
-
   const language = useSelector((state: RootState) => state.language.language)
   const productsData = useSelector((state: RootState) => state.products.data)
   const categoriesData = useSelector((state: RootState) => state.categories)
@@ -48,6 +50,15 @@ const ProductDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
+  // State for image zoom
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [zoomLensPosition, setZoomLensPosition] = useState({ x: 0, y: 0 })
+  const [zoomBgOffset, setZoomBgOffset] = useState({ x: 0, y: 0 })
+  const mainImageContainerRef = useRef<HTMLDivElement>(null) // Ref for the container holding the main image Swiper
+
+  const zoomFactor = 2.5 // How much to zoom
+  const lensSize = 150 // Size of the magnifying glass (square)
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -56,7 +67,6 @@ const ProductDetails: React.FC = () => {
     if (!brand || !nameUrl || !id) return null
     const brandProducts = productsData[brand]
     if (!brandProducts) return null
-
     for (const prod of brandProducts) {
       const variant = prod.variants.find((v) => v.id === id && v.nameUrl === nameUrl)
       if (variant) {
@@ -133,7 +143,6 @@ const ProductDetails: React.FC = () => {
       dispatch(addToast({ message: t("select_size_error"), type: "warning" }))
       return
     }
-
     const newQuantity = Math.max(0, quantity + amount)
     if (newQuantity === 0) {
       dispatch(removeItemFromCart({ id: currentProductVariant!.id, size: selectedSizeDetails.size }))
@@ -163,7 +172,6 @@ const ProductDetails: React.FC = () => {
       dispatch(addToast({ message: t("select_size_error"), type: "warning" }))
       return
     }
-
     if (currentProductVariant && selectedSizeDetails) {
       dispatch(
         addItemToCart({
@@ -198,9 +206,8 @@ const ProductDetails: React.FC = () => {
         }
       })
       dispatch(addToast({ message: t("cart_cleared_for_product"), type: "info" }))
-
       const telegramUrl = `https://t.me/poyzenuzbot?start=${currentProductVariant.id}-${selectedSizeDetails.size}-${quantity}`
-      window.open(telegramUrl, "_blank") 
+      window.open(telegramUrl, "_blank")
       setIsModalOpen(false)
     }
   }
@@ -225,8 +232,41 @@ const ProductDetails: React.FC = () => {
   }
 
   const getSeasonName = (seasonId: number) => {
-    const season = categoriesData.season.find((s: Season) => s.id === seasonId)
+    const season = categoriesData.season.find((season: Season) => season.id === seasonId)
     return season ? getLocalizedName(season.name) : t("unknown_season")
+  }
+
+  // Zoom handlers
+  const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!mainImageContainerRef.current) return
+
+    const { left, top, width, height } = mainImageContainerRef.current.getBoundingClientRect()
+    const mouseX = e.clientX - left // Mouse X relative to container
+    const mouseY = e.clientY - top // Mouse Y relative to container
+
+    // Calculate lens position (centered on mouse)
+    const lensX = mouseX - lensSize / 2
+    const lensY = mouseY - lensSize / 2
+
+    // Clamp lens position to stay within container bounds
+    const clampedLensX = Math.max(0, Math.min(lensX, width - lensSize))
+    const clampedLensY = Math.max(0, Math.min(lensY, height - lensSize))
+    setZoomLensPosition({ x: clampedLensX, y: clampedLensY })
+
+    // Calculate background position for the zoomed image within the lens
+    // This formula centers the magnified portion under the cursor
+    const bgPosX = -(mouseX * zoomFactor - lensSize / 2)
+    const bgPosY = -(mouseY * zoomFactor - lensSize / 2)
+
+    setZoomBgOffset({ x: bgPosX, y: bgPosY })
+  }
+
+  const handleImageMouseEnter = () => {
+    setIsZoomed(true)
+  }
+
+  const handleImageMouseLeave = () => {
+    setIsZoomed(false)
   }
 
   if (!currentProductVariant) {
@@ -263,7 +303,8 @@ const ProductDetails: React.FC = () => {
               {currentProductVariant.brand}
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium block truncate max-w-[200px]"
+            <span
+              className="text-gray-900 font-medium block truncate max-w-[200px]"
               title={currentProductVariant.productName}
             >
               {currentProductVariant.productName}
@@ -271,25 +312,30 @@ const ProductDetails: React.FC = () => {
           </nav>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             <Card className="overflow-hidden">
-              <div className="relative">
+              <div
+                ref={mainImageContainerRef}
+                className="relative w-full aspect-square" // Ensure container has defined dimensions
+                onMouseEnter={handleImageMouseEnter}
+                onMouseLeave={handleImageMouseLeave}
+                onMouseMove={handleImageMouseMove}
+              >
                 <Swiper
                   spaceBetween={10}
                   thumbs={{ swiper: thumbsSwiper }}
                   modules={[FreeMode, Thumbs]}
                   onSlideChange={(swiper) => setActiveImageIndex(swiper.activeIndex)}
-                  className="aspect-square"
+                  className="w-full h-full" // Swiper should fill its container
                 >
                   {currentProductVariant.images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <img
                         src={image || "/placeholder.svg"}
                         alt={`${currentProductVariant.productName} ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain" // Use object-contain to prevent cropping
                         onError={(e) => {
                           e.currentTarget.src = "/placeholder.svg" // Fallback on error
                         }}
@@ -297,7 +343,6 @@ const ProductDetails: React.FC = () => {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-
                 <button
                   onClick={handleToggleLike}
                   className={`absolute top-2 right-2 rounded-full p-2 shadow z-10 transition-all duration-300 ease-in-out transform hover:scale-110 ${
@@ -309,18 +354,32 @@ const ProductDetails: React.FC = () => {
                   {isLiked(currentProductVariant.id) ? (
                     <AiFillHeart className="w-5 h-5 text-teal-400 animate-pulse" />
                   ) : (
-                    <AiOutlineHeart className="w-5 h-5 text-gray-600 hover:text-teal-400 transition-colors duration-200" />
+                    <AiOutlineHeart className="w-5 h-5 text-gray-600 hover:text-teal-400 duration-200" />
                   )}
                 </button>
-
                 {discountPercentage > 0 && (
                   <Badge className="absolute z-20 top-4 left-4 bg-red-500 text-white font-bold text-lg py-2 px-4 rounded-lg shadow-md">
                     -{discountPercentage}%
                   </Badge>
                 )}
+
+                {/* Zoom Lens Overlay */}
+                {isZoomed && (
+                  <div
+                    className="absolute z-30 border-2 border-blue-500 rounded-full overflow-hidden pointer-events-none"
+                    style={{
+                      left: zoomLensPosition.x,
+                      top: zoomLensPosition.y,
+                      width: lensSize,
+                      height: lensSize,
+                      backgroundImage: `url(${currentProductVariant.images[activeImageIndex] || "/placeholder.svg"})`,
+                      backgroundSize: `${(mainImageContainerRef.current?.offsetWidth || 0) * zoomFactor}px ${(mainImageContainerRef.current?.offsetHeight || 0) * zoomFactor}px`, // Scale based on container size
+                      backgroundPosition: `${zoomBgOffset.x}px ${zoomBgOffset.y}px`,
+                    }}
+                  />
+                )}
               </div>
             </Card>
-
             <div className="px-2">
               <Swiper
                 onSwiper={setThumbsSwiper}
@@ -352,12 +411,10 @@ const ProductDetails: React.FC = () => {
               </Swiper>
             </div>
           </div>
-
           <div className="space-y-4">
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
               <p className="text-lg text-gray-600 mb-4">{currentProductVariant.brand}</p>
-
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -374,7 +431,6 @@ const ProductDetails: React.FC = () => {
                 <span className="text-sm text-gray-600">({currentProductVariant.rating}/5)</span>
               </div>
             </div>
-
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-4">{t("productInfo")}</h3>
               <div className="space-y-3">
@@ -400,7 +456,6 @@ const ProductDetails: React.FC = () => {
                 </div>
               </div>
             </Card>
-
             <div>
               <h3 className="text-lg font-semibold mb-3">{t("colors")}:</h3>
               <div className="flex gap-3">
@@ -425,7 +480,6 @@ const ProductDetails: React.FC = () => {
                 })}
               </div>
             </div>
-
             <div>
               <h3 className="text-lg font-semibold mb-3">{t("sizes")}</h3>
               <div className="grid grid-cols-4 gap-2">
@@ -446,7 +500,6 @@ const ProductDetails: React.FC = () => {
                 )}
               </div>
             </div>
-
             {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
               <div className="p-4 mb-6">
                 <p className="text-blue-800 font-medium">
@@ -457,7 +510,6 @@ const ProductDetails: React.FC = () => {
                 </p>
               </div>
             )}
-
             <div className="flex items-center gap-3 mb-6">
               {discountPercentage > 0 ? (
                 <>
@@ -474,7 +526,6 @@ const ProductDetails: React.FC = () => {
                 </span>
               )}
             </div>
-
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <span className="text-lg font-medium">{t("quantity")}:</span>
@@ -494,19 +545,21 @@ const ProductDetails: React.FC = () => {
                   </Button>
                 </div>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button
-                  onClick={cartItem && cartItem.quantity > 0 ? () => window.location.href = `/${language}/cart` : handleAddToCart}
+                  onClick={
+                    cartItem && cartItem.quantity > 0
+                      ? () => (window.location.href = `/${language}/cart`)
+                      : handleAddToCart
+                  }
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
                   variant="outline"
                   size="lg"
                   className="h-14 text-lg font-semibold border"
                 >
                   <ShoppingCart className="mr-2 w-5 h-5" />
-                    {cartItem && cartItem.quantity > 0 ? t("goToCart") : t("addToCart")}
+                  {cartItem && cartItem.quantity > 0 ? t("goToCart") : t("addToCart")}
                 </Button>
-
                 <Button
                   onClick={handleBuyNow}
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock || quantity <= 0}
@@ -519,18 +572,12 @@ const ProductDetails: React.FC = () => {
             </div>
           </div>
         </div>
-
         <Card className="mt-8 p-4">
           <h3 className="text-xl font-semibold mb-4">{t("aboutProduct")}</h3>
           <p className="text-gray-700 leading-relaxed text-lg">{getLocalizedName(currentProductVariant.description)}</p>
         </Card>
       </div>
-
-      <BuyConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleConfirmBuy}
-      />
+      <BuyConfirmationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmBuy} />
     </div>
   )
 }
