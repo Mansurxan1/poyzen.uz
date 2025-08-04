@@ -25,7 +25,7 @@ const Banner = () => {
   }
 
   return (
-    <section className="relative w-full py-8 overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+    <section className="relative w-full py-4 overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4">
         <Swiper
           modules={[Pagination, Autoplay]}

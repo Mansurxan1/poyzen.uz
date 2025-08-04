@@ -91,20 +91,17 @@ const CartPage: React.FC = () => {
   const advancePaymentAmount = total * 0.3
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-gray-50 py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-8 lg:mb-12"
+          className="text-center mb-8"
         >
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 tracking-tight">
-            {t("shoppingCart")}
+          <h1 className="text-xl sm:text-3xl font-bold text-blue-500 uppercase tracking-tight">
+            {t("items")} {cartItems.length} 
           </h1>
-          <p className="mt-2 text-base sm:text-lg text-gray-600">
-            {cartItems.length} {t("items")}
-          </p>
         </motion.div>
 
         {cartItems.length === 0 ? (
@@ -112,11 +109,8 @@ const CartPage: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white rounded-xl shadow-md p-6 sm:p-8 text-center border border-gray-100"
+            className="p-6 sm:p-8 text-center"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <FaShoppingCart className="w-8 h-8 text-gray-500" />
-            </div>
             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">{t("emptyCart")}</h3>
             <p className="text-gray-500 mb-8 text-base sm:text-lg max-w-md mx-auto">{t("addItemsToCart")}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -148,7 +142,7 @@ const CartPage: React.FC = () => {
             >
               <div className="flex items-center gap-3 mb-6">
                 <FaShoppingCart className="w-6 h-6 text-emerald-600" />
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{t("cart_items")}</h2>
+                <h2 className="sm:text-2xl font-bold text-gray-800">{t("cart_items")}</h2>
               </div>
               <AnimatePresence>
                 {cartItems.map((item) => {
@@ -189,7 +183,7 @@ const CartPage: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleQuantityChange(item.id, item.size, item.quantity - 1)}
-                            className="border-gray-300 hover:border-gray-400 p-2 w-8 h-8 flex items-center justify-center"
+                            className="border-gray-300 border hover:border-gray-400 p-2 w-8 h-8 flex items-center justify-center"
                           >
                             <FaMinus className="w-3 h-3" />
                           </Button>
@@ -198,7 +192,7 @@ const CartPage: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleQuantityChange(item.id, item.size, item.quantity + 1)}
-                            className="border-gray-300 hover:border-gray-400 p-2 w-8 h-8 flex items-center justify-center"
+                            className="border-gray-300 border hover:border-gray-400 p-2 w-8 h-8 flex items-center justify-center"
                           >
                             <FaPlus className="w-3 h-3" />
                           </Button>
@@ -211,7 +205,7 @@ const CartPage: React.FC = () => {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleRemoveItem(item.id, item.size)}
-                            className="text-red-500 hover:text-red-700 p-2 w-8 h-8 flex items-center justify-center"
+                            className="text-red-500 border hover:text-red-700 p-2 w-8 h-8 flex items-center justify-center"
                           >
                             <FaTrash className="w-4 h-4" />
                           </Button>
@@ -225,7 +219,7 @@ const CartPage: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={handleClearCart}
-                  className="bg-transparent border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors duration-200 text-sm px-4 py-2"
+                  className="bg-transparent border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors duration-200 text-sm px-4 py-2"
                 >
                   <FaTrash className="w-3 h-3 mr-2" />
                   {t("clearCart")}
@@ -244,10 +238,10 @@ const CartPage: React.FC = () => {
                 <FaCreditCard className="w-6 h-6 text-emerald-600" />
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{t("orderSummary")}</h2>
               </div>
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-gray-700 text-base">
                   <span>
-                    {t("sub_total")} ({cartItems.length} {t("items")})
+                    {t("sub_total")}:
                   </span>
                   <span className="font-medium">
                     {formatPrice(subTotal)} {currency.toUpperCase()}
@@ -255,7 +249,7 @@ const CartPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-red-500 text-base">
                   <span>
-                    {t("discount")} ({discountPercentage * 100}%)
+                    {t("discount")} {discountPercentage * 100}% :
                   </span>
                   <span className="font-medium">
                     -{formatPrice(discountAmount)} {currency.toUpperCase()}
@@ -266,17 +260,17 @@ const CartPage: React.FC = () => {
                   <span className="font-medium">{t("free_delivery")}</span>
                 </div>
                 <div className="flex justify-between text-gray-700 text-base">
-                  <span>{t("advance_payment_amount")} (30%)</span>
+                  <span>{t("delivery_timeline")}</span>
+                  <span className="font-medium">{t("delivery_10_15_days")}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 text-base">
+                  <span>{t("advance_payment_amount")} 30% :</span>
                   <span className="font-medium">
                     {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-700 text-base">
-                  <span>{t("delivery_timeline")}</span>
-                  <span className="font-medium">{t("delivery_10_15_days")}</span>
-                </div>
                 <div className="flex justify-between text-lg sm:text-xl font-bold text-gray-900 pt-4 border-t border-gray-200">
-                  <span>{t("total")}</span>
+                  <span>{t("total")}:</span>
                   <span>
                     {formatPrice(total)} {currency.toUpperCase()}
                   </span>
@@ -285,13 +279,12 @@ const CartPage: React.FC = () => {
               <div className="text-xs text-gray-500 mb-6 space-y-2">
                 <p className="flex items-center gap-2">
                   <FaTruck className="w-4 h-4 text-emerald-500" />
-                  <span>{t("free_delivery")}</span>
+                  <span>{t("free_delivery1")}</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <FaShieldAlt className="w-4 h-4 text-blue-500" />
-                  <span>{t("90_day_warranty")}</span>
-                  <Link to={`/${language}/warranty-details`} className="text-blue-600 hover:underline ml-1">
-                    {t("details")}
+                  <Link to={`/${language}/contract`} className="text-blue-600 hover:underline">
+                    {t("contract")}
                   </Link>
                 </p>
               </div>
@@ -312,7 +305,7 @@ const CartPage: React.FC = () => {
         onClose={handleCloseModal}
         onConfirm={handleConfirmPurchase}
       />
-    </div>
+    </section>
   )
 }
 

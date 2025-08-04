@@ -4,6 +4,7 @@ import type { RootState } from '@/redux';
 import { Link } from 'react-router-dom';
 import jordan from '@/assets/jordan.svg';
 import newbalance from '@/assets/newbalance.svg';
+import { useTranslation } from 'react-i18next';
 
 const brandLogos = [
   { id: "nike", name: "Nike", image: "https://1000logos.net/wp-content/uploads/2017/03/Nike-Logo.png" },
@@ -23,6 +24,7 @@ const brandLogos = [
 ];
 
 const Brand: React.FC = () => {
+  const { t } = useTranslation()
   const language = useSelector((state: RootState) => state.language.language);
 
   useEffect(() => {
@@ -31,8 +33,8 @@ const Brand: React.FC = () => {
 
   return (
     <section className="w-full px-4 py-8 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-6 text-center">
-        Mashhur Sneakers Brendlari
+      <h2 className="text-2xl uppercase text-blue-500 font-bold mb-6 text-center">
+        {t('famousBrand')}
       </h2>
 
       <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-5 place-items-center">
@@ -51,17 +53,17 @@ const Brand: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-12 text-center">
+      <div className="mt-8 text-center">
         <p className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
-          Siz qidirgan brend topilmadi?
+          {t('contactAdmin')}
         </p>
         <a
           href="https://t.me/poyzenUz_Admin"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-5 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300"
+          className="inline-block underline"
         >
-          Adminga murojaat qiling, siz izlagan brend albatta topiladi!
+          {t("admin")}
         </a>
       </div>
     </section>

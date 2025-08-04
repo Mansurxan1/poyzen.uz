@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useTranslation } from "react-i18next"
 import { Bell, Mail, CheckCircle, Pin } from "lucide-react"
@@ -31,24 +29,22 @@ const BuyConfirmationModal: React.FC<BuyConfirmationModalProps> = ({ isOpen, onC
               <p className="text-sm">
                 {t(
                   "telegram_redirect_message",
-                  "Sizni hozir Telegram botga yo'naltiramiz. Iltimos, bot ochilgach, 'Start' tugmasini bosing.",
                 )}
               </p>
             </div>
             <div className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
               <p className="text-sm">
-                {t("confirm_order_message", "Bu tugma orqali sizning buyurtmangiz tasdiqlanadi.")}
+                {t("confirm_order_message")}
               </p>
             </div>
             <div className="flex items-start gap-3">
               <Pin className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold">{t("important", "Muhim!")}</p>
+                <p className="text-sm font-semibold">{t("important")}</p>
                 <p className="text-sm">
                   {t(
-                    "admin_contact_warning",
-                    "Agar siz 'Start' tugmasini bosmasangiz, admin siz bilan bog'lana olmaydi.",
+                    "admin_contact_warning"
                   )}
                 </p>
               </div>
@@ -59,12 +55,12 @@ const BuyConfirmationModal: React.FC<BuyConfirmationModalProps> = ({ isOpen, onC
             <Button
               onClick={onClose}
               variant="outline"
-              className="flex-1 border-gray-300 hover:bg-gray-100 text-gray-700 bg-transparent"
+              className="flex-1 text-base border border-gray-300 bg-gray-100 text-gray-700"
             >
-              {t("cancel", "Bekor qilish")}
+              {t("cancel")}
             </Button>
-            <Button onClick={onConfirm} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white">
-              {t("confirm", "Tasdiqlash")}
+            <Button onClick={onConfirm} className="flex-1 text-base bg-emerald-600 hover:bg-emerald-700 text-white">
+              {t("confirm")}
             </Button>
           </div>
         </div>

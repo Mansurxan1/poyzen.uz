@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleProfileClick = () => {
-    window.open("https://www.google.com", "_blank");
+    window.open("https://poyzen-uz.vercel.app", "_blank");
     setIsMobileMenuOpen(false);
   };
 
@@ -111,7 +111,7 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2">
               <Button onClick={toggleSearch} variant="ghost" size="icon">
                 <FaSearch className="h-5 w-5" />
               </Button>

@@ -54,8 +54,8 @@ const Home = () => {
   return (
     <main className="flex flex-col items-center">
       <Banner />
-      <section className="w-full py-8 max-w-7xl mx-auto px-4">
-        <h2 className="text-2xl font-semibold mb-6 text-center">
+      <section className="w-full py-4 max-w-7xl mx-auto px-4">
+        <h2 className="text-xl uppercase font-bold mb-6 text-blue-500 text-center">
           {t("famousBrand")}
         </h2>
         <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-5 place-items-center">
@@ -77,7 +77,7 @@ const Home = () => {
           ))}
           <Link
             to={`/${language}/brands`}
-            className="flex items-center justify-center px-6 py-10 md:px-10 md:py-13 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transition-all duration-300 border border-blue-600"
+            className="flex items-center uppercase justify-center px-6 py-8 md:px-10 md:py-11 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transition-all duration-300 border border-blue-600"
             aria-label={t("allBrand")}
           >
             <span className="text-sm font-bold text-center">
@@ -86,7 +86,7 @@ const Home = () => {
           </Link>
         </div>
       </section>
-      <section className="w-full py-8 max-w-7xl mx-auto">
+      <section className="w-full py-4 max-w-7xl mx-auto">
         <Last24HoursProducts />
       </section>
     </main>

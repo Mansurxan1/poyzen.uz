@@ -200,7 +200,7 @@ const ProductDetails: React.FC = () => {
       dispatch(addToast({ message: t("cart_cleared_for_product"), type: "info" }))
 
       const telegramUrl = `https://t.me/poyzenuzbot?start=${currentProductVariant.id}-${selectedSizeDetails.size}-${quantity}`
-      window.open(telegramUrl, "_blank") // Open Telegram in a new tab
+      window.open(telegramUrl, "_blank") 
       setIsModalOpen(false)
     }
   }
@@ -355,7 +355,7 @@ const ProductDetails: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">{currentProductVariant.productName}</h1>
               <p className="text-lg text-gray-600 mb-4">{currentProductVariant.brand}</p>
 
               <div className="flex items-center gap-2 mb-4">
@@ -376,33 +376,33 @@ const ProductDetails: React.FC = () => {
             </div>
 
             <Card className="p-4">
-              <h3 className="text-lg font-semibold mb-4">Mahsulot ma'lumotlari</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("productInfo")}</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Artikul:</span>
+                  <span className="text-gray-600"> {t("productId")}:</span>
                   <span className="font-medium">{currentProductVariant.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Jins:</span>
+                  <span className="text-gray-600">{t("gender")}:</span>
                   <span className="font-medium">{t(currentProductVariant.gender.toLowerCase())}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Material:</span>
+                  <span className="text-gray-600">{t("material")}:</span>
                   <span className="font-medium">{getMaterialName(currentProductVariant.materials)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Mavsum:</span>
+                  <span className="text-gray-600">{t("season")}:</span>
                   <span className="font-medium">{getSeasonName(currentProductVariant.season)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Yil:</span>
+                  <span className="text-gray-600">{t("year")}:</span>
                   <span className="font-medium">{currentProductVariant.year}</span>
                 </div>
               </div>
             </Card>
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Rang</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("colors")}:</h3>
               <div className="flex gap-3">
                 {uniqueColorVariants.map((variant) => {
                   const color = categoriesData.colors.find((c: Color) => c.id === variant.color)
@@ -413,8 +413,8 @@ const ProductDetails: React.FC = () => {
                       onClick={() => {
                         window.location.href = `/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`
                       }}
-                      className={`w-8 h-8 rounded-full border-4 flex items-center justify-center transition-all ${
-                        isSelected ? "border-blue-500 scale-110" : "border-gray-300 hover:border-gray-400"
+                      className={`w-8 h-8 rounded-full flex cursor-pointer items-center justify-center transition-all ${
+                        isSelected ? "border-blue-500 border-2" : ""
                       }`}
                       style={{ backgroundColor: color?.color }}
                       title={getColorName(variant.color)}
@@ -427,7 +427,7 @@ const ProductDetails: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">O'lcham</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("sizes")}</h3>
               <div className="grid grid-cols-4 gap-2">
                 {availableSizes.length > 0 ? (
                   availableSizes.map((size: ProductSizeType) => (
@@ -436,13 +436,13 @@ const ProductDetails: React.FC = () => {
                       variant={selectedSize === size.size ? "default" : "outline"}
                       onClick={() => handleSizeSelect(size.size)}
                       disabled={!size.inStock}
-                      className="text-lg font-semibold"
+                      className="text-lg font-semibold border"
                     >
                       {size.size}
                     </Button>
                   ))
                 ) : (
-                  <p className="text-gray-500 col-span-4">Mavjud o'lchamlar yo'q</p>
+                  <p className="text-gray-500 col-span-4">{t("noSizesAvailable")}</p>
                 )}
               </div>
             </div>
@@ -477,7 +477,7 @@ const ProductDetails: React.FC = () => {
 
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <span className="text-lg font-medium">Miqdor:</span>
+                <span className="text-lg font-medium">{t("quantity")}:</span>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <Button
                     variant="ghost"
@@ -501,10 +501,10 @@ const ProductDetails: React.FC = () => {
                   disabled={!selectedSizeDetails || !selectedSizeDetails.inStock}
                   variant="outline"
                   size="lg"
-                  className="h-14 text-lg font-semibold"
+                  className="h-14 text-lg font-semibold border"
                 >
                   <ShoppingCart className="mr-2 w-5 h-5" />
-                  {cartItem && cartItem.quantity > 0 ? "Savatga o'tish" : "Savatga qo'shish"}
+                    {cartItem && cartItem.quantity > 0 ? t("goToCart") : t("addToCart")}
                 </Button>
 
                 <Button
@@ -513,7 +513,7 @@ const ProductDetails: React.FC = () => {
                   size="lg"
                   className="h-14 text-lg font-semibold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 >
-                  Hozir sotib olish
+                  {t("buyNow")}
                 </Button>
               </div>
             </div>
@@ -521,7 +521,7 @@ const ProductDetails: React.FC = () => {
         </div>
 
         <Card className="mt-8 p-4">
-          <h3 className="text-xl font-semibold mb-4">Mahsulot haqida</h3>
+          <h3 className="text-xl font-semibold mb-4">{t("aboutProduct")}</h3>
           <p className="text-gray-700 leading-relaxed text-lg">{getLocalizedName(currentProductVariant.description)}</p>
         </Card>
       </div>

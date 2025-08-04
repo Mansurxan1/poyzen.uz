@@ -109,9 +109,9 @@ const Last24HoursProducts = () => {
   }
 
   return (
-    <section className="w-full sm:px-4 py-8">
-      <h2 className="text-xl font-bold mb-4 text-center">
-        {t("new_arrivals")} ({t("latest_products")})
+    <section className="w-full sm:px-4 py-4">
+      <h2 className="text-xl uppercase font-bold text-blue-500 mb-4 text-center">
+        {t("newProducts")}
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 auto-rows-fr">
         {recentVariants.map((item) => {
@@ -202,7 +202,7 @@ const Last24HoursProducts = () => {
       </div>
       <div className="flex justify-center mt-4">
         <Link to={`/${lang}/products`}>
-          <Button variant="outline" className="w-full max-w-xs bg-transparent">
+          <Button variant="outline" className="w-full border text-base p-8 bg-transparent">
             {t("view_more")}
           </Button>
         </Link>

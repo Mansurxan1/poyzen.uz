@@ -60,7 +60,7 @@ const BrandPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 sm:px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center capitalize">
+        <h1 className="text-xl font-bold text-blue-500 uppercase mb-8 text-center">
           {brandKey} {t("products")}
         </h1>
         
@@ -76,15 +76,15 @@ const BrandPage = () => {
               ))}
             </div>
             
-            <div className="mt-12 text-center">
-              <p className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
-                Siz izlagan model topilmadi?
+            <div className="mt-8 text-center">
+              <p className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-4">
+                 {t("modelNotFound")}
               </p>
               <a
                 href="https://t.me/poyzenUz_Admin"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mx-4 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300"
+                className="inline-block mx-4 underline"
               >
                 Adminga murojaat qiling, siz izlagan tovar albatta topiladi!
               </a>

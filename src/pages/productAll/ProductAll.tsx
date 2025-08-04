@@ -87,15 +87,15 @@ const ProductAll: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto py-4">
-        <div className="flex flex-col px-4 lg:flex-row lg:items-center lg:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("all_products")}</h1>
-            <p className="text-gray-600">
+        <div className="flex flex-col justify-center pt-4 px-4 lg:flex-row mb-4">
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-blue-500 uppercase mb-2">
+              {t("all_products")}
+            </h1>
+            <p className="text-gray-600 font-semibold">
               {t("total_products")}: {sortedProducts.length}
             </p>
           </div>
-
           <div className="flex items-center gap-4 mt-4 lg:mt-0">
             <Button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -110,6 +110,7 @@ const ProductAll: React.FC = () => {
             </Button>
           </div>
         </div>
+      <div className="max-w-7xl mx-auto py-4">
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
           <div className="hidden lg:block lg:sticky lg:top-4 pl-4 lg:self-start">
