@@ -264,7 +264,11 @@ const ProductDetails: React.FC = () => {
               {currentProductVariant.brand}
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900 font-medium">{currentProductVariant.productName}</span>
+            <span className="text-gray-900 font-medium block truncate max-w-[200px]"
+              title={currentProductVariant.productName}
+            >
+              {currentProductVariant.productName}
+            </span>
           </nav>
         </div>
       </div>
@@ -360,34 +364,6 @@ const ProductDetails: React.FC = () => {
                 </div>
                 <span className="text-sm text-gray-600">({currentProductVariant.rating}/5)</span>
               </div>
-
-              <div className="flex items-center gap-3 mb-6">
-                {discountPercentage > 0 ? (
-                  <>
-                    <span className="text-3xl font-bold text-green-600">
-                      {formatPrice(displayDiscount)} {currency.toUpperCase()}
-                    </span>
-                    <span className="text-xl text-gray-400 line-through">
-                      {formatPrice(displayPrice)} {currency.toUpperCase()}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-3xl font-bold text-gray-900">
-                    {formatPrice(displayPrice)} {currency.toUpperCase()}
-                  </span>
-                )}
-              </div>
-
-              {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
-                <Card className="p-4 bg-blue-50 border-blue-200 mb-6">
-                  <p className="text-blue-800 font-medium">
-                    {t("in_advance_payment_details")}{" "}
-                    <span className="font-bold">
-                      {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
-                    </span>
-                  </p>
-                </Card>
-              )}
             </div>
 
             <Card className="p-6">
@@ -426,7 +402,7 @@ const ProductDetails: React.FC = () => {
                     <button
                       key={variant.id}
                       onClick={() => navigate(`/${language}/${variant.brand}/${variant.nameUrl}/${variant.id}`)}
-                      className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all ${
+                      className={`w-8 h-8 rounded-full border-4 flex items-center justify-center transition-all ${
                         isSelected ? "border-blue-500 scale-110" : "border-gray-300 hover:border-gray-400"
                       }`}
                       style={{ backgroundColor: color?.color }}
@@ -449,7 +425,7 @@ const ProductDetails: React.FC = () => {
                       variant={selectedSize === size.size ? "default" : "outline"}
                       onClick={() => handleSizeSelect(size.size)}
                       disabled={!size.inStock}
-                      className="h-12 text-lg font-semibold"
+                      className="text-lg font-semibold"
                     >
                       {size.size}
                     </Button>
@@ -459,6 +435,35 @@ const ProductDetails: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {currentProductVariant?.inAdvancePayment && selectedSize !== null && (
+              <div className="p-4 mb-6">
+                <p className="text-blue-800 font-medium">
+                  {t("in_advance_payment_details")}{" "}
+                  <span className="font-bold">
+                    {formatPrice(advancePaymentAmount)} {currency.toUpperCase()}
+                  </span>
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 mb-6">
+                {discountPercentage > 0 ? (
+                  <>
+                    <span className="text-xl sm:text-3xl font-bold text-green-600">
+                      {formatPrice(displayDiscount)} {currency.toUpperCase()}
+                    </span>
+                    <span className="text-xl text-gray-400 line-through">
+                      {formatPrice(displayPrice)} {currency.toUpperCase()}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-3xl font-bold text-gray-900">
+                    {formatPrice(displayPrice)} {currency.toUpperCase()}
+                  </span>
+                )}
+              </div>
+              
 
             <div className="space-y-4">
               <div className="flex items-center gap-4">
