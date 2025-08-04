@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaHeart, FaShoppingCart, FaUser, FaBars, FaTimes, FaSearch } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,8 +13,6 @@ import logo from "@/assets/logo.png";
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
   const currentLang = useSelector((state: RootState) => state.language.language);
   const currentCurrency = useSelector((state: RootState) => state.currency.currency);
@@ -62,16 +60,16 @@ const Navbar: React.FC = () => {
     } else {
       targetPath = `/${newLangValue}/${pathSegments.join("/")}`;
     }
-    navigate(targetPath);
+    window.location.pathname = targetPath;
   };
 
   const handleLikesClick = () => {
-    navigate(`/${currentLang}/likes`);
+    window.location.pathname = `/${currentLang}/likes`;
     setIsMobileMenuOpen(false);
   };
 
   const handleCartClick = () => {
-    navigate(`/${currentLang}/cart`);
+    window.location.pathname = `/${currentLang}/cart`;
     setIsMobileMenuOpen(false);
   };
 
@@ -99,8 +97,8 @@ const Navbar: React.FC = () => {
                     to={`/${currentLang}${link.to}`}
                     className={
                       "text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative group" +
-                      (location.pathname === `/${currentLang}${link.to}` ||
-                      (link.to === "/" && location.pathname === `/${currentLang}`)
+                      (window.location.pathname === `/${currentLang}${link.to}` ||
+                      (link.to === "/" && window.location.pathname === `/${currentLang}`)
                         ? " bg-blue-100 text-blue-700"
                         : "")
                     }
@@ -181,8 +179,8 @@ const Navbar: React.FC = () => {
                     onClick={toggleMobileMenu}
                     className={
                       "block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-base font-medium" +
-                      (location.pathname === `/${currentLang}${link.to}` ||
-                      (link.to === "/" && location.pathname === `/${currentLang}`)
+                      (window.location.pathname === `/${currentLang}${link.to}` ||
+                      (link.to === "/" && window.location.pathname === `/${currentLang}`)
                         ? " bg-blue-100 text-blue-700"
                         : "")
                     }

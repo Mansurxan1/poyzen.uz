@@ -18,7 +18,7 @@ const SectionHeader: React.FC<{
     <h2 className="font-bold text-gray-800">{title}</h2>
     {count !== undefined && (
       <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-        {count} ta natija
+        {count}
       </span>
     )}
   </div>
@@ -44,7 +44,7 @@ const Search: React.FC = () => {
         {hasExactResults ? (
           <section className="mb-8" aria-labelledby="search-results">
             <SectionHeader
-              icon={<FaStar className="w-6 h-6 text-yellow-500" aria-hidden="true" />}
+              icon={<FaStar className="w-6 h-6 ml-2 text-yellow-500" aria-hidden="true" />}
               title={t("searchResults")}
               count={searchResults.length}
             />

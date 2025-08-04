@@ -26,23 +26,31 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
   const handleSearchSubmit = (query: string) => {
     if (query.trim()) {
       navigate(`/${currentLang}/search?q=${encodeURIComponent(query.trim())}`);
-      setSearchQuery(""); // Clear the input after submission
-      toggleSearch(); // Close the search bar after submission
+    } else {
+      navigate(`/${currentLang}/products`);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    handleSearchSubmit(query); // Trigger search on every input change
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearchSubmit(searchQuery);
+      toggleSearch(); // Close the search bar on Enter
     } else if (e.key === "Escape") {
-      setSearchQuery(""); // Clear input on escape
+      setSearchQuery(""); // Clear input on Escape
       toggleSearch();
+      navigate(`/${currentLang}/products`); // Navigate back to products on Escape
     }
   };
 
   return (
     <div
-      className={`fixed inset-0 z-40 bg-black/20 bg-opacity-50 transition-opacity duration-300 ease-in-out ${
+      className={`fixed inset-0 z-40 bg-opacity-50 transition-opacity duration-300 ease-in-out ${
         isSearchOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       onClick={toggleSearch}
@@ -62,10 +70,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
               ref={searchInputRef}
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("searchPlaceholder") || "Search products..."}
-              className="block w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              onChange={handleInputChange} // Trigger search on input change
               onKeyDown={handleKeyDown}
+              placeholder={t("searchProducts")}
+              className="block w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             />
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
               <Button
@@ -77,7 +85,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearchOpen, toggleSearch }) => 
                 <FiSearch className="h-5 w-5" />
               </Button>
               <Button
-                onClick={toggleSearch}
+                onClick={() => {
+                  setSearchQuery("");
+                  toggleSearch();
+                  navigate(`/${currentLang}/products`);
+                }}
                 variant="ghost"
                 size="icon"
                 className="text-gray-400 hover:text-blue-600"

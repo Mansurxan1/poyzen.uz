@@ -80,5 +80,8 @@
   "cancel": "Ortga",
   "confirm": "Tasdiqlash",
   "emptyCart": "Savatingiz bo'sh",
-  "addItemsToCart": "Savatingizga mahsulotlarni qo'shing"
+  "addItemsToCart": "Savatingizga mahsulotlarni qo'shing",
+  "searchResults": "Topilgan mahsulotlar soni",
+  "no_results_for_query": "Ma'lumot topilmadi",
+  "products_you_might_like": "Sizga taklif qilamiz:"
 }
